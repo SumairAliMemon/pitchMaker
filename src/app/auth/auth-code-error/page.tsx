@@ -2,8 +2,12 @@
 
 import { AlertCircle, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 export default function AuthCodeErrorPage() {
+  const searchParams = useSearchParams()
+  const error = searchParams.get('error')
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
@@ -16,9 +20,17 @@ export default function AuthCodeErrorPage() {
             Authentication Error
           </h1>
           
-          <p className="text-gray-600 mb-8">
+          <p className="text-gray-600 mb-4">
             Sorry, there was an issue with your authentication link. This could happen if the link has expired or has already been used.
           </p>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6">
+              <p className="text-sm text-red-700">
+                <strong>Error details:</strong> {error}
+              </p>
+            </div>
+          )}
           
           <div className="space-y-4">
             <Link

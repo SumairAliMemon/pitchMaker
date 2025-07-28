@@ -4,6 +4,9 @@ import { supabase } from '@/lib/supabase'
 import { ArrowRight, Check, Mail, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
