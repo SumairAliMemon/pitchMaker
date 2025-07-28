@@ -27,7 +27,7 @@ export const profileService = {
         return null
       }
 
-      return data
+      return data as unknown as UserProfile
     } catch (error) {
       console.error('Error fetching profile:', error)
       return null
@@ -51,7 +51,7 @@ export const profileService = {
         return null
       }
 
-      return data
+      return data as unknown as UserProfile
     } catch (error) {
       console.error('Error upserting profile:', error)
       return null
@@ -73,7 +73,7 @@ export const profileService = {
         return null
       }
 
-      return data
+      return data as unknown as UserProfile
     } catch (error) {
       console.error('Error updating profile:', error)
       return null
