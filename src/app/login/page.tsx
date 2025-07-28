@@ -2,7 +2,6 @@
 
 import { supabase } from '@/lib/supabase'
 import { ArrowRight, Check, Mail, Sparkles } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 
 export default function LoginPage() {
@@ -31,7 +30,7 @@ export default function LoginPage() {
         setMessage('Check your email for the magic link!')
         setIsSuccess(true)
       }
-    } catch (error) {
+    } catch {
       setMessage('An unexpected error occurred')
       setIsSuccess(false)
     } finally {
@@ -48,9 +47,9 @@ export default function LoginPage() {
             <Sparkles className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-            Welcome Back
+            Welcome to Pitch Maker
           </h1>
-          <p className="text-gray-600 mt-2">Sign in to your account with magic link</p>
+          <p className="text-gray-600 mt-2">Sign in with magic link to create your perfect pitch</p>
         </div>
 
         {/* Login Form */}
@@ -116,13 +115,7 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="mt-8 text-center">
             <p className="text-gray-600 text-sm">
-              Don't have an account?{' '}
-              <Link 
-                href="/signup" 
-                className="font-semibold text-blue-600 hover:text-blue-700 transition-colors duration-200"
-              >
-                Sign up here
-              </Link>
+              New user? No problem! Just sign in with your email and we&apos;ll create your account automatically.
             </p>
           </div>
         </div>
@@ -130,7 +123,7 @@ export default function LoginPage() {
         {/* Magic Link Info */}
         <div className="mt-6 text-center">
           <p className="text-xs text-gray-500">
-            We'll send you a secure link to sign in without a password
+            We&apos;ll send you a secure link to sign in without a password
           </p>
         </div>
       </div>

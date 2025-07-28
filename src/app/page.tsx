@@ -11,10 +11,10 @@ export default function Home() {
             <Sparkles className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-5xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-4">
-            AI-Powered Resume Matcher
+            AI-Powered Pitch Maker
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Upload your resume and job description to get AI-powered insights and matching analysis.
+            Share your details and job description - get a compelling, personalized pitch that makes you stand out.
           </p>
         </header>
 
@@ -24,9 +24,9 @@ export default function Home() {
             <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Upload className="w-8 h-8 text-blue-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">Upload Documents</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">Share Your Details</h3>
             <p className="text-gray-600">
-              Easily upload your resume and job description for instant analysis.
+              Provide your background, skills, and experience along with the job description.
             </p>
           </div>
 
@@ -34,9 +34,9 @@ export default function Home() {
             <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Sparkles className="w-8 h-8 text-purple-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">AI Analysis</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">AI Pitch Generation</h3>
             <p className="text-gray-600">
-              Get intelligent matching insights powered by advanced AI technology.
+              Get a compelling, personalized pitch crafted by advanced AI technology.
             </p>
           </div>
 
@@ -44,9 +44,9 @@ export default function Home() {
             <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">Instant Results</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">Perfect Pitch</h3>
             <p className="text-gray-600">
-              Receive comprehensive analysis and recommendations in seconds.
+              Receive a tailored pitch that highlights your strengths for the specific role.
             </p>
           </div>
         </div>
@@ -68,15 +68,15 @@ export default function Home() {
               <div className="w-12 h-12 bg-purple-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
                 2
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Upload Files</h3>
-              <p className="text-gray-600">Upload your resume and the job description you&apos;re targeting</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Share Details</h3>
+              <p className="text-gray-600">Provide your background, skills, and the job description you&apos;re targeting</p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
                 3
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Get Results</h3>
-              <p className="text-gray-600">Receive detailed analysis and improvement suggestions</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Get Your Pitch</h3>
+              <p className="text-gray-600">Receive a compelling, personalized pitch for your target role</p>
             </div>
           </div>
         </div>
@@ -84,10 +84,10 @@ export default function Home() {
         {/* CTA Section */}
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-12 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Ready to optimize your resume?
+            Ready to create your perfect pitch?
           </h2>
           <p className="text-gray-600 mb-8 text-lg">
-            Get started with AI-powered resume analysis in just a few clicks.
+            Get started with AI-powered pitch generation in just a few clicks.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -96,14 +96,6 @@ export default function Home() {
               className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-2xl font-semibold hover:from-blue-600 hover:to-purple-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
             >
               <span>Get Started</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            
-            <Link
-              href="/signup"
-              className="w-full sm:w-auto bg-gray-100 text-gray-700 px-8 py-4 rounded-2xl font-semibold hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center space-x-2"
-            >
-              <span>Create Account</span>
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
