@@ -32,21 +32,27 @@ export default function LoginPage() {
     setMessage('')
 
     try {
+      const redirectUrl = `${window.location.origin}/auth/callback`
+      console.log('Magic link redirect URL:', redirectUrl)
+      
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: redirectUrl,
+          shouldCreateUser: true,
         },
       })
 
       if (error) {
-        setMessage(error.message)
+        setMessage(`Error: ${error.message}`)
         setIsSuccess(false)
+        console.error('Magic link error:', error)
       } else {
-        setMessage('Check your email for the magic link!')
+        setMessage(`Check your email for the magic link! (Redirect URL: ${redirectUrl})`)
         setIsSuccess(true)
       }
-    } catch {
+    } catch (error) {
+      console.error('Unexpected error:', error)
       setMessage('An unexpected error occurred')
       setIsSuccess(false)
     } finally {
