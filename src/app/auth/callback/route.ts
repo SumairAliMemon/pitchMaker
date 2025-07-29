@@ -7,13 +7,14 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/dashboard'
 
-  console.log('Auth callback called with:', { 
-    code: code ? 'present' : 'missing', 
-    origin, 
-    next,
-    fullUrl: request.url,
-    headers: Object.fromEntries(request.headers.entries())
-  })
+  console.log('=== AUTH CALLBACK DEBUG ===')
+  console.log('Full URL:', request.url)
+  console.log('Search params:', Object.fromEntries(searchParams.entries()))
+  console.log('Code present:', code ? 'YES' : 'NO')
+  console.log('Origin:', origin)
+  console.log('Next:', next)
+  console.log('All headers:', Object.fromEntries(request.headers.entries()))
+  console.log('=========================')
 
   if (code) {
     try {

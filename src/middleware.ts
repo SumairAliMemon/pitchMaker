@@ -3,6 +3,12 @@ import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
 export async function middleware(req: NextRequest) {
+  // Skip middleware for auth callback routes - these need to be processed without interference
+  if (req.nextUrl.pathname.startsWith('/auth/')) {
+    console.log('Skipping middleware for auth route:', req.nextUrl.pathname)
+    return NextResponse.next()
+  }
+
   // Skip middleware if Supabase credentials are not configured
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     console.warn('Supabase credentials not found. Skipping authentication middleware.')
@@ -59,5 +65,15 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard', '/login', '/signup']
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - auth (authentication routes)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|auth).*)',
+  ],
 }
