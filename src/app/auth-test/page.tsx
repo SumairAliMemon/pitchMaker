@@ -1,14 +1,17 @@
 'use client'
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createBrowserClient } from '@supabase/ssr'
 import { useState } from 'react'
 
 export default function AuthTest() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
-  const [debugInfo, setDebugInfo] = useState<unknown>(null)
-  const supabase = createClientComponentClient()
+  const [debugInfo, setDebugInfo] = useState<string | null>(null)
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
 
   const testMagicLink = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,15 +34,15 @@ export default function AuthTest() {
       
       if (error) {
         setMessage(`❌ Error: ${error.message}`)
-        setDebugInfo(error)
+        setDebugInfo(JSON.stringify(error, null, 2))
       } else {
         setMessage(`✅ Magic link sent! Check your email and CLICK the link (don't type the URL manually)`)
-        setDebugInfo(data)
+        setDebugInfo(JSON.stringify(data, null, 2))
       }
     } catch (error) {
       console.error('Unexpected error:', error)
       setMessage('❌ Unexpected error occurred')
-      setDebugInfo(error)
+      setDebugInfo(JSON.stringify(error, null, 2))
     } finally {
       setLoading(false)
     }
@@ -83,7 +86,7 @@ export default function AuthTest() {
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
               <h3 className="font-semibold mb-2">Debug Info:</h3>
               <pre className="text-xs overflow-auto">
-                {JSON.stringify(debugInfo, null, 2)}
+                {debugInfo}
               </pre>
             </div>
           )}
