@@ -11,6 +11,16 @@ export const dynamic = 'force-dynamic'
 function AuthErrorContent() {
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
+  const details = searchParams.get('details')
+
+  let parsedDetails = null
+  if (details) {
+    try {
+      parsedDetails = JSON.parse(details)
+    } catch {
+      // Ignore parsing errors
+    }
+  }
 
   return (
     <div className="max-w-md w-full">
@@ -28,12 +38,29 @@ function AuthErrorContent() {
         </p>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6">
-            <p className="text-sm text-red-700">
-              <strong>Error details:</strong> {error}
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6 text-left">
+            <p className="text-sm text-red-700 mb-2">
+              <strong>Error:</strong> {error}
             </p>
+            {parsedDetails && (
+              <div className="text-xs text-red-600">
+                <p><strong>Status:</strong> {parsedDetails.status}</p>
+                <p><strong>Code:</strong> {parsedDetails.code}</p>
+              </div>
+            )}
           </div>
         )}
+
+        {/* Troubleshooting section */}
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6 text-left">
+          <h3 className="text-sm font-semibold text-blue-800 mb-2">Common solutions:</h3>
+          <ul className="text-xs text-blue-700 space-y-1">
+            <li>• Make sure you&apos;re clicking the link in the same browser</li>
+            <li>• Check if the link has expired (links expire after 1 hour)</li>
+            <li>• Request a new magic link if the current one doesn&apos;t work</li>
+            <li>• Clear your browser cache and cookies</li>
+          </ul>
+        </div>
         
         <div className="space-y-4">
           <Link

@@ -1,10 +1,10 @@
 'use client'
 
-import { supabase } from '@/lib/supabase'
 import { AuthStateManager } from '@/lib/authStateManager'
+import { supabase } from '@/lib/supabase'
 import { ArrowRight, Check, Mail, Sparkles } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'

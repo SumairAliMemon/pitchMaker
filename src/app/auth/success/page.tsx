@@ -2,7 +2,7 @@
 
 import { AuthStateManager } from '@/lib/authStateManager'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
