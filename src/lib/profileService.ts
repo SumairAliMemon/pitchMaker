@@ -3,11 +3,11 @@ import { supabase } from './supabase'
 export interface UserProfile {
   id: string
   email: string
-  full_name?: string
-  background_details?: string
-  skills?: string
-  experience?: string
-  education?: string
+  full_name?: string | null
+  background_details?: string | null
+  skills?: string | null
+  experience?: string | null
+  education?: string | null
   created_at: string
   updated_at: string
 }
@@ -24,6 +24,10 @@ export const profileService = {
 
       if (error) {
         console.error('Error fetching profile:', error)
+        return null
+      }
+
+      if (!data) {
         return null
       }
 
