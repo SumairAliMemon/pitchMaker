@@ -1,9 +1,22 @@
 import { ArrowRight, CheckCircle, Sparkles, Upload } from "lucide-react";
 import Link from "next/link";
 
+// Add client-side auth state management for cross-tab communication
+function AuthStateListener() {
+  if (typeof window !== 'undefined') {
+    import('@/lib/authStateManager').then(({ AuthStateManager }) => {
+      AuthStateManager.onAuthSuccess(() => {
+        window.location.href = '/dashboard'
+      })
+    })
+  }
+  return null
+}
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100">
+      <AuthStateListener />
       <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Header */}
         <header className="text-center mb-16">

@@ -1,8 +1,10 @@
 'use client'
 
 import { supabase } from '@/lib/supabase'
+import { AuthStateManager } from '@/lib/authStateManager'
 import { ArrowRight, Check, Mail, Sparkles } from 'lucide-react'
-import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -12,6 +14,17 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
+  const router = useRouter()
+
+  // Listen for auth success from other tabs
+  useEffect(() => {
+    const cleanup = AuthStateManager.onAuthSuccess(() => {
+      // If user gets authenticated in another tab, redirect this tab too
+      router.push('/dashboard')
+    })
+
+    return cleanup
+  }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()

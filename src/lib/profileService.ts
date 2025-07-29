@@ -31,19 +31,32 @@ export const profileService = {
         return null
       }
 
-      return data as unknown as UserProfile
+      // Ensure the data matches UserProfile structure
+      const profile: UserProfile = {
+        id: data.id as string,
+        email: data.email as string,
+        full_name: data.full_name as string | null,
+        background_details: data.background_details as string | null,
+        skills: data.skills as string | null,
+        experience: data.experience as string | null,
+        education: data.education as string | null,
+        created_at: data.created_at as string,
+        updated_at: data.updated_at as string,
+      }
+
+      return profile
     } catch (error) {
       console.error('Error fetching profile:', error)
       return null
     }
   },
 
-  // Create or update user profile
-  async upsertProfile(profile: Partial<UserProfile>): Promise<UserProfile | null> {
+    // Create or update user profile
+  async upsertProfile(profileData: Partial<UserProfile>): Promise<UserProfile | null> {
     try {
       const { data, error } = await supabase
         .from('user_profiles')
-        .upsert(profile, { 
+        .upsert(profileData, { 
           onConflict: 'id',
           ignoreDuplicates: false 
         })
@@ -55,7 +68,24 @@ export const profileService = {
         return null
       }
 
-      return data as unknown as UserProfile
+      if (!data) {
+        return null
+      }
+
+      // Ensure the data matches UserProfile structure
+      const profile: UserProfile = {
+        id: data.id as string,
+        email: data.email as string,
+        full_name: data.full_name as string | null,
+        background_details: data.background_details as string | null,
+        skills: data.skills as string | null,
+        experience: data.experience as string | null,
+        education: data.education as string | null,
+        created_at: data.created_at as string,
+        updated_at: data.updated_at as string,
+      }
+
+      return profile
     } catch (error) {
       console.error('Error upserting profile:', error)
       return null
@@ -77,7 +107,24 @@ export const profileService = {
         return null
       }
 
-      return data as unknown as UserProfile
+      if (!data) {
+        return null
+      }
+
+      // Ensure the data matches UserProfile structure
+      const profile: UserProfile = {
+        id: data.id as string,
+        email: data.email as string,
+        full_name: data.full_name as string | null,
+        background_details: data.background_details as string | null,
+        skills: data.skills as string | null,
+        experience: data.experience as string | null,
+        education: data.education as string | null,
+        created_at: data.created_at as string,
+        updated_at: data.updated_at as string,
+      }
+
+      return profile
     } catch (error) {
       console.error('Error updating profile:', error)
       return null

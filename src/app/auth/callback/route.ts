@@ -38,11 +38,13 @@ export async function GET(request: NextRequest) {
 
     if (data?.session) {
       console.log('Auth successful, redirecting to:', `${origin}${next}`)
-      return NextResponse.redirect(`${origin}${next}`)
+      
+      // Create a response that will trigger cross-tab communication
+      const response = NextResponse.redirect(`${origin}/auth/success?redirect=${encodeURIComponent(next)}`)
+      return response
     }
   }
 
   console.log('No code or session, redirecting to error page')
-  // Return the user to an error page with instructions
   return NextResponse.redirect(`${origin}/auth/auth-code-error`)
 }
