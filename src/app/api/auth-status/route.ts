@@ -33,13 +33,20 @@ export async function GET() {
       session: {
         exists: !!session,
         expires_at: session?.expires_at,
-        user_id: session?.user?.id
+        user_id: session?.user?.id,
+        access_token: session?.access_token ? session.access_token.substring(0, 50) + '...' : null,
+        full_token_available: !!session?.access_token
       },
       user: {
         exists: !!user,
         id: user?.id,
         email: user?.email,
         created_at: user?.created_at
+      },
+      token_instructions: {
+        note: 'For testing, you need the full access_token from the session',
+        browser_method: 'Check localStorage -> sb-[project]-auth-token -> access_token',
+        database_query: 'SELECT access_token FROM auth.sessions WHERE user_id = \'...\''
       },
       message: session && user ? 'User is authenticated' : 'User is not authenticated',
       timestamp: new Date().toISOString()

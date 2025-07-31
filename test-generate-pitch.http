@@ -1,0 +1,120 @@
+# Test the pitch generation API endpoint
+# Make sure your server is running: npm run dev
+
+### 0. Get User Session Token (Alternative Method)
+GET http://localhost:3000/api/auth-status
+# This will show you the current user session and token if logged in
+
+### 1. Test Pitch Generation with Full Profile
+POST http://localhost:3000/api/generate-pitch
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "job_description": "We are looking for a Full Stack Developer with experience in React, Node.js, and MongoDB. The ideal candidate should have strong problem-solving skills and experience with modern web development practices. You will be responsible for building scalable web applications and working with our development team.",
+  "job_title": "Full Stack Developer",
+  "company_name": "Tech Solutions Inc",
+  "use_saved_profile": true
+}
+
+### 2. Test Pitch Generation with Minimal Data
+POST http://localhost:3000/api/generate-pitch
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "job_description": "Looking for a Software Engineer with JavaScript experience. Must have good communication skills and ability to work in a team environment.",
+  "job_title": "Software Engineer",
+  "company_name": "StartupCorp"
+}
+
+### 3. Test with Long Job Description (MERN Stack)
+POST http://localhost:3000/api/generate-pitch
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "job_description": "We are seeking a talented MERN Stack Developer to join our growing team. The ideal candidate will have extensive experience with MongoDB, Express.js, React.js, and Node.js. Responsibilities include: - Developing and maintaining web applications using the MERN stack - Collaborating with cross-functional teams to define, design, and ship new features - Writing clean, maintainable, and efficient code - Participating in code reviews and providing constructive feedback - Troubleshooting and debugging applications - Staying up-to-date with emerging technologies and industry trends. Requirements: - Bachelor's degree in Computer Science or related field - 3+ years of experience with MERN stack development - Strong proficiency in JavaScript, HTML, and CSS - Experience with RESTful APIs and GraphQL - Knowledge of version control systems (Git) - Excellent problem-solving skills and attention to detail - Strong communication and teamwork abilities. We offer competitive salary, health benefits, flexible working hours, and opportunities for professional growth.",
+  "job_title": "MERN Stack Developer",  
+  "company_name": "InnovateTech Solutions",
+  "use_saved_profile": true
+}
+
+### 4. Test Error Handling - Missing Job Description
+POST http://localhost:3000/api/generate-pitch
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "job_title": "Developer",
+  "company_name": "Test Company"
+}
+
+### 5. Test Direct Gemini API (for debugging)
+POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent
+Content-Type: application/json
+x-goog-api-key: AIzaSyApeU7dGzKFodIYkqOUOM0-SetHQ-jVPXIe
+
+{
+  "contents": [
+    {
+      "parts": [
+        {
+          "text": "Write a professional cover letter for this job application:\n\nJob Title: Full Stack Developer\nCompany: Tech Solutions Inc\nJob Description: We are looking for a Full Stack Developer with experience in React, Node.js, and MongoDB.\n\nCandidate Information:\nName: Sumair\nBackground: AI Engineer\nSkills: MERN Stack\nExperience: Software Development\nEducation: Fast NUCES\n\nWrite ONLY the cover letter text. No markdown formatting. No ** or * symbols. Just plain text."
+        }
+      ]
+    }
+  ],
+  "generationConfig": {
+    "temperature": 0.7,
+    "topK": 40,
+    "topP": 0.95,
+    "maxOutputTokens": 1024
+  }
+}
+
+###
+
+# Instructions:
+# 1. Start your Next.js dev server: npm run dev
+# 2. Get your JWT token using ONE of these methods:
+
+# METHOD 1: From Browser (Easiest)
+#    - Go to your app in browser and login
+#    - Open Developer Tools (F12)
+#    - Go to Application/Storage tab → Local Storage
+#    - Find localStorage → sb-[project-id]-auth-token
+#    - Copy the access_token value
+
+# METHOD 2: From Database (Direct)
+#    - Connect to your Supabase database
+#    - Query: SELECT * FROM auth.sessions WHERE user_id = 'your-user-id';
+#    - Use the access_token from the result
+
+# METHOD 3: From API (Programmatic)
+#    - First run test #0 above to get session info
+#    - Or create a login endpoint that returns the token
+
+# METHOD 4: Test without token (if you modify the API temporarily)
+#    - Comment out the auth check in generate-pitch/route.ts for testing
+#    - Add: // if (userError || !user) { return NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
+
+# 3. Replace YOUR_JWT_TOKEN_HERE with your actual token
+# 4. Use VS Code REST Client extension to run these requests  
+# 5. Check terminal logs for detailed Gemini API responses
+
+# Quick Database Query to Get Token:
+# SELECT 
+#   u.email,
+#   s.access_token,
+#   s.expires_at
+# FROM auth.users u
+# JOIN auth.sessions s ON u.id = s.user_id
+# WHERE u.email = 'your-email@example.com'
+# ORDER BY s.created_at DESC
+# LIMIT 1;
+
+# Expected Results:
+# - Test 1-3: Should return personalized cover letters
+# - Test 4: Should return 400 error for missing job_description
+# - Test 5: Direct Gemini test - should work if API key is valid
