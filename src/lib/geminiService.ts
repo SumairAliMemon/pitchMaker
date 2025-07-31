@@ -76,31 +76,38 @@ export class GeminiService {
     jobTitle: string,
     companyName: string
   ): string {
-    return `Create a personalized, professional pitch letter for a job application. Here are the details:
+    return `Write a professional cover letter for this job application. Make it sound natural and human, not AI-generated.
 
-**User Profile:**
-- Name: ${userProfile.full_name || 'Candidate'}
-- Email: ${userProfile.email}
-- Background: ${userProfile.background_details || 'Professional background not specified'}
-- Skills: ${userProfile.skills || 'Skills not specified'}
-- Experience: ${userProfile.experience || 'Experience not specified'}
-- Education: ${userProfile.education || 'Education not specified'}
+Candidate Information:
+Name: ${userProfile.full_name || 'Candidate'}
+Email: ${userProfile.email}
+Background: ${userProfile.background_details || 'Professional background not specified'}
+Skills: ${userProfile.skills || 'Skills not specified'}
+Experience: ${userProfile.experience || 'Experience not specified'}
+Education: ${userProfile.education || 'Education not specified'}
 
-**Job Details:**
-- Position: ${jobTitle}
-- Company: ${companyName}
-- Job Description: ${jobDescription}
+Job Information:
+Position: ${jobTitle}
+Company: ${companyName}
+Job Description: ${jobDescription}
 
-**Requirements:**
-1. Write a professional cover letter/pitch
-2. Highlight relevant skills and experience that match the job requirements
-3. Show enthusiasm for the specific role and company
-4. Keep it concise but compelling (300-500 words)
-5. Use a professional tone
-6. Include specific examples where possible
-7. End with a strong call to action
+STRICT REQUIREMENTS:
+- Write ONLY the cover letter content, nothing else
+- NO markdown formatting (**, *, #, bullet points, etc.)
+- NO AI-sounding phrases like "I am excited to" or "I would be thrilled"
+- NO cliché phrases like "perfect fit" or "unique opportunity"
+- Use natural, conversational language
+- Make it sound like a real person wrote it, not AI
+- Write in simple, clear sentences
+- Avoid corporate jargon and buzzwords
+- Keep it professional but human
+- Length: 250-350 words maximum
+- Start with "Dear Hiring Manager," or appropriate greeting
+- End with "Best regards," or "Sincerely," followed by the name
+- Focus on specific skills and experience relevant to the job
+- Be direct and honest, not overly enthusiastic
 
-Format the response as a complete cover letter that can be copied and used directly.`
+Generate only the cover letter text that sounds genuinely human-written.`
   }
 }
 

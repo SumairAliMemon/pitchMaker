@@ -105,34 +105,31 @@ export default function DashboardPage() {
 
 I am writing to express my strong interest in the ${jobTitle} position at ${companyName}. After reviewing the job requirements, I am confident that my background and experience make me an excellent candidate for this role.
 
-**About My Background:**
+About My Background:
 ${profile.background_details || 'I bring a diverse professional background with experience across multiple domains.'}
 
-**My Relevant Experience:**
+My Relevant Experience:
 ${profile.experience || 'I have gained valuable experience that directly applies to the challenges and opportunities in this role.'}
 
-**Technical Skills & Expertise:**
+Technical Skills and Expertise:
 ${profile.skills ? `My technical skill set includes: ${profile.skills}` : 'I possess a comprehensive technical skill set that aligns with modern industry requirements.'}
 
-**Educational Foundation:**
+Educational Foundation:
 ${profile.education || 'My educational background has provided me with a strong foundation for continuous learning and professional growth.'}
 
-**Why I'm Excited About This Opportunity:**
+Why I am Excited About This Opportunity:
 Based on the job description, I am particularly drawn to this role because it aligns perfectly with my career goals and expertise. The challenges outlined in your posting are exactly the type of problems I am passionate about solving.
 
-**What I Can Contribute:**
-• Immediate impact through my relevant experience and skills
-• Fresh perspectives combined with proven problem-solving abilities  
-• Strong commitment to ${companyName}'s mission and values
-• Enthusiasm for contributing to your team's continued success
+What I Can Contribute:
+- Immediate impact through my relevant experience and skills
+- Fresh perspectives combined with proven problem-solving abilities  
+- Strong commitment to ${companyName}'s mission and values
+- Enthusiasm for contributing to your team's continued success
 
 I would welcome the opportunity to discuss how my background and passion can contribute to ${companyName}'s objectives. Thank you for considering my application.
 
-Best regards,
-${profile.full_name || 'Your Name'}
-
----
-*This pitch has been personalized based on your profile and tailored specifically for the ${jobTitle} role at ${companyName}.*`
+Sincerely,
+${profile.full_name || 'Your Name'}`
   }
 
   const copyToClipboard = async (text: string) => {
