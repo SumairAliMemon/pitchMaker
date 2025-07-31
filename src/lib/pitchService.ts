@@ -6,24 +6,12 @@ export interface Pitch {
   job_description_id?: string | null
   job_title?: string | null
   company_name?: string | null
-  raw_job_description: string
+  job_description: string
+  user_profile_snapshot?: Record<string, unknown>
   generated_pitch: string
   pitch_status: 'generated' | 'favorited' | 'used'
   created_at: string
   updated_at: string
-}
-
-export interface PitchHistory {
-  id: string
-  user_id: string
-  pitch_id?: string | null
-  job_title?: string | null
-  company_name?: string | null
-  job_description: string
-  user_details_snapshot: string
-  generated_pitch: string
-  generation_method: 'ai' | 'template' | 'manual'
-  created_at: string
 }
 
 export interface CreatePitchData {
@@ -34,7 +22,7 @@ export interface CreatePitchData {
 }
 
 export const pitchService = {
-  // Generate and save a new pitch
+  // Create a new pitch
   async createPitch(
     userId: string,
     pitchData: CreatePitchData,
@@ -48,7 +36,7 @@ export const pitchService = {
           job_description_id: pitchData.job_description_id || null,
           job_title: pitchData.job_title || null,
           company_name: pitchData.company_name || null,
-          raw_job_description: pitchData.job_description,
+          job_description: pitchData.job_description,
           generated_pitch: generatedPitch,
           pitch_status: 'generated'
         })
@@ -67,7 +55,7 @@ export const pitchService = {
     }
   },
 
-  // Get all pitches for a user
+  // Get user's pitches
   async getUserPitches(userId: string): Promise<Pitch[]> {
     try {
       const { data, error } = await supabase
@@ -88,8 +76,8 @@ export const pitchService = {
     }
   },
 
-  // Get a specific pitch
-  async getPitch(pitchId: string): Promise<Pitch | null> {
+  // Get pitch by ID
+  async getPitchById(pitchId: string): Promise<Pitch | null> {
     try {
       const { data, error } = await supabase
         .from('pitches')
@@ -109,32 +97,30 @@ export const pitchService = {
     }
   },
 
-  // Update pitch status (favorited, used, etc.)
+  // Update pitch status
   async updatePitchStatus(
     pitchId: string,
     status: 'generated' | 'favorited' | 'used'
-  ): Promise<Pitch | null> {
+  ): Promise<boolean> {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('pitches')
         .update({ pitch_status: status })
         .eq('id', pitchId)
-        .select()
-        .single()
 
       if (error) {
         console.error('Error updating pitch status:', error)
-        return null
+        return false
       }
 
-      return data as unknown as Pitch
+      return true
     } catch (error) {
       console.error('Error updating pitch status:', error)
-      return null
+      return false
     }
   },
 
-  // Delete a pitch
+  // Delete pitch
   async deletePitch(pitchId: string): Promise<boolean> {
     try {
       const { error } = await supabase
@@ -154,86 +140,37 @@ export const pitchService = {
     }
   },
 
-  // Get pitch history for a user
-  async getUserPitchHistory(userId: string): Promise<PitchHistory[]> {
-    try {
-      const { data, error } = await supabase
-        .from('pitch_history')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('Error fetching pitch history:', error)
-        return []
-      }
-
-      return data as unknown as PitchHistory[]
-    } catch (error) {
-      console.error('Error fetching pitch history:', error)
-      return []
-    }
-  },
-
-  // Get pitch history with details (using view)
-  async getUserPitchHistoryDetails(userId: string): Promise<Record<string, unknown>[]> {
-    try {
-      const { data, error } = await supabase
-        .from('pitch_history_details')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('Error fetching pitch history details:', error)
-        return []
-      }
-
-      return data || []
-    } catch (error) {
-      console.error('Error fetching pitch history details:', error)
-      return []
-    }
-  },
-
-  // Delete pitch history entry
-  async deletePitchHistory(historyId: string): Promise<boolean> {
-    try {
-      const { error } = await supabase
-        .from('pitch_history')
-        .delete()
-        .eq('id', historyId)
-
-      if (error) {
-        console.error('Error deleting pitch history:', error)
-        return false
-      }
-
-      return true
-    } catch (error) {
-      console.error('Error deleting pitch history:', error)
-      return false
-    }
-  },
-
-  // Get pitches by job description
-  async getPitchesByJobDescription(jobDescriptionId: string): Promise<Pitch[]> {
+  // Get pitch statistics
+  async getPitchStats(userId: string): Promise<{
+    total: number
+    generated: number
+    favorited: number
+    used: number
+  }> {
     try {
       const { data, error } = await supabase
         .from('pitches')
-        .select('*')
-        .eq('job_description_id', jobDescriptionId)
-        .order('created_at', { ascending: false })
+        .select('pitch_status')
+        .eq('user_id', userId)
 
       if (error) {
-        console.error('Error fetching pitches by job description:', error)
-        return []
+        console.error('Error fetching pitch stats:', error)
+        return { total: 0, generated: 0, favorited: 0, used: 0 }
       }
 
-      return data as unknown as Pitch[]
+      const stats = data.reduce(
+        (acc, pitch) => {
+          acc.total++
+          acc[pitch.pitch_status as keyof typeof acc]++
+          return acc
+        },
+        { total: 0, generated: 0, favorited: 0, used: 0 }
+      )
+
+      return stats
     } catch (error) {
-      console.error('Error fetching pitches by job description:', error)
-      return []
+      console.error('Error fetching pitch stats:', error)
+      return { total: 0, generated: 0, favorited: 0, used: 0 }
     }
   }
 }

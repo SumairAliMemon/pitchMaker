@@ -86,28 +86,58 @@ export const jobDescriptionService = {
       return []
     }
   },
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
+
+  // Get job description by ID
+  async getJobDescriptionById(jobId: string): Promise<JobDescription | null> {
+    try {
+      const { data, error } = await supabase
+        .from('job_descriptions')
+        .select('*')
+        .eq('id', jobId)
+        .single()
 
       if (error) {
-        console.error('Error fetching job descriptions:', error)
-        return []
+        console.error('Error fetching job description:', error)
+        return null
       }
 
-      return data as unknown as SavedJobDescription[]
+      return data as unknown as JobDescription
     } catch (error) {
-      console.error('Error fetching job descriptions:', error)
-      return []
+      console.error('Error fetching job description:', error)
+      return null
     }
   },
 
-  // Delete a saved job description
-  async deleteJobDescription(jobDescriptionId: string): Promise<boolean> {
+  // Update job description
+  async updateJobDescription(
+    jobId: string,
+    updateData: Partial<CreateJobDescriptionData>
+  ): Promise<boolean> {
     try {
       const { error } = await supabase
-        .from('saved_job_descriptions')
+        .from('job_descriptions')
+        .update(updateData)
+        .eq('id', jobId)
+
+      if (error) {
+        console.error('Error updating job description:', error)
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.error('Error updating job description:', error)
+      return false
+    }
+  },
+
+  // Delete job description
+  async deleteJobDescription(jobId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('job_descriptions')
         .delete()
-        .eq('id', jobDescriptionId)
+        .eq('id', jobId)
 
       if (error) {
         console.error('Error deleting job description:', error)
@@ -121,28 +151,23 @@ export const jobDescriptionService = {
     }
   },
 
-  // Update a saved job description
-  async updateJobDescription(
-    jobDescriptionId: string,
-    updates: Partial<Pick<SavedJobDescription, 'title' | 'company' | 'description'>>
-  ): Promise<SavedJobDescription | null> {
+  // Toggle save status
+  async toggleSaveStatus(jobId: string, isSaved: boolean): Promise<boolean> {
     try {
-      const { data, error } = await supabase
-        .from('saved_job_descriptions')
-        .update({ ...updates, updated_at: new Date().toISOString() })
-        .eq('id', jobDescriptionId)
-        .select()
-        .single()
+      const { error } = await supabase
+        .from('job_descriptions')
+        .update({ is_saved: isSaved })
+        .eq('id', jobId)
 
       if (error) {
-        console.error('Error updating job description:', error)
-        return null
+        console.error('Error toggling save status:', error)
+        return false
       }
 
-      return data as unknown as SavedJobDescription
+      return true
     } catch (error) {
-      console.error('Error updating job description:', error)
-      return null
+      console.error('Error toggling save status:', error)
+      return false
     }
   }
 }

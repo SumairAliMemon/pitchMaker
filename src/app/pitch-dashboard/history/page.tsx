@@ -27,16 +27,17 @@ export default function PitchHistoryPage() {
   useEffect(() => {
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
+      const currentUser = session?.user ?? null
+      setUser(currentUser)
       
-      if (session?.user) {
-        // Load pitch history
-        const history = await pitchHistoryService.getUserPitchHistory(session.user.id)
-        setPitchHistory(history)
-      } else {
+      if (!currentUser) {
         router.push('/login')
+        return
       }
-      
+
+      // Load pitch history using the current user
+      const history = await pitchHistoryService.getUserPitchHistory(currentUser.id)
+      setPitchHistory(history)
       setLoading(false)
     }
 
@@ -44,6 +45,8 @@ export default function PitchHistoryPage() {
   }, [router, supabase.auth])
 
   const handleDeletePitch = async (pitchId: string) => {
+    if (!user) return
+    
     if (confirm('Are you sure you want to delete this pitch? This action cannot be undone.')) {
       const success = await pitchHistoryService.deletePitchHistory(pitchId)
       if (success) {
