@@ -1,6 +1,6 @@
 'use client'
 
-import { createBrowserClient } from '@supabase/ssr'
+import { supabase } from '@/lib/supabase'
 import { useState } from 'react'
 
 export default function AuthTest() {
@@ -8,10 +8,6 @@ export default function AuthTest() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [debugInfo, setDebugInfo] = useState<string | null>(null)
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
 
   const testMagicLink = async (e: React.FormEvent) => {
     e.preventDefault()

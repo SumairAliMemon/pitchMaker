@@ -1,23 +1,11 @@
 import { UserProfile } from '@/lib/profileService'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createSupabaseServer } from '@/lib/supabaseServer'
 import { NextRequest, NextResponse } from 'next/server'
 
 // POST /api/generate-pitch - Generate a pitch using AI
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          }
-        }
-      }
-    )
+    const supabase = await createSupabaseServer()
 
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser()

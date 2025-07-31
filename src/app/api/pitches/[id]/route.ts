@@ -1,161 +1,106 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { getPitchById, updatePitchStatus, deletePitch, getAuthenticatedUser } from '@/lib/pitchApiService'
 import { NextRequest, NextResponse } from 'next/server'
 
-// GET /api/pitches/[id] - Get a specific pitch
+// GET /api/pitches/[id] - Get specific pitch
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: pitchId } = await params
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          }
-        }
-      }
-    )
-
-    // Get current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    const { id } = await params
     
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!id) {
+      return NextResponse.json({ error: 'Pitch ID is required' }, { status: 400 })
+    }
+
+    // Get authenticated user
+    const { user, error: authError, status: authStatus } = await getAuthenticatedUser()
+    
+    if (authError) {
+      return NextResponse.json({ error: authError }, { status: authStatus })
     }
 
     // Get the pitch
-    const { data: pitch, error } = await supabase
-      .from('pitches')
-      .select('*')
-      .eq('id', pitchId)
-      .eq('user_id', user.id) // Ensure user can only access their own pitches
-      .single()
-
+    const { pitch, error, status } = await getPitchById(id, user!.id)
+    
     if (error) {
-      if (error.code === 'PGRST116') {
-        return NextResponse.json({ error: 'Pitch not found' }, { status: 404 })
-      }
-      console.error('Error fetching pitch:', error)
-      return NextResponse.json({ error: 'Failed to fetch pitch' }, { status: 500 })
+      return NextResponse.json({ error }, { status })
     }
 
     return NextResponse.json({ pitch })
+
   } catch (error) {
-    console.error('API Error:', error)
+    console.error('Error in GET /api/pitches/[id]:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-// PUT /api/pitches/[id] - Update a pitch (mainly for status updates)
-export async function PUT(
+// PATCH /api/pitches/[id] - Update pitch status
+export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: pitchId } = await params
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          }
-        }
-      }
-    )
-
-    // Get current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
-    
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
+    const { id } = await params
     const body = await request.json()
     const { pitch_status } = body
 
-    // Validate pitch_status if provided
-    if (pitch_status && !['generated', 'favorited', 'used'].includes(pitch_status)) {
-      return NextResponse.json(
-        { error: 'Invalid pitch_status. Must be one of: generated, favorited, used' }, 
-        { status: 400 }
-      )
+    if (!id) {
+      return NextResponse.json({ error: 'Pitch ID is required' }, { status: 400 })
+    }
+
+    // Get authenticated user
+    const { user, error: authError, status: authStatus } = await getAuthenticatedUser()
+    
+    if (authError) {
+      return NextResponse.json({ error: authError }, { status: authStatus })
     }
 
     // Update the pitch
-    const { data: pitch, error } = await supabase
-      .from('pitches')
-      .update({ pitch_status })
-      .eq('id', pitchId)
-      .eq('user_id', user.id) // Ensure user can only update their own pitches
-      .select()
-      .single()
-
+    const { pitch, error, status } = await updatePitchStatus(id, user!.id, pitch_status)
+    
     if (error) {
-      if (error.code === 'PGRST116') {
-        return NextResponse.json({ error: 'Pitch not found' }, { status: 404 })
-      }
-      console.error('Error updating pitch:', error)
-      return NextResponse.json({ error: 'Failed to update pitch' }, { status: 500 })
+      return NextResponse.json({ error }, { status })
     }
 
     return NextResponse.json({ pitch })
+
   } catch (error) {
-    console.error('API Error:', error)
+    console.error('Error in PATCH /api/pitches/[id]:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-// DELETE /api/pitches/[id] - Delete a pitch
+// DELETE /api/pitches/[id] - Delete pitch
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: pitchId } = await params
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          }
-        }
-      }
-    )
+    const { id } = await params
 
-    // Get current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    if (!id) {
+      return NextResponse.json({ error: 'Pitch ID is required' }, { status: 400 })
+    }
+
+    // Get authenticated user
+    const { user, error: authError, status: authStatus } = await getAuthenticatedUser()
     
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (authError) {
+      return NextResponse.json({ error: authError }, { status: authStatus })
     }
 
     // Delete the pitch
-    const { error } = await supabase
-      .from('pitches')
-      .delete()
-      .eq('id', pitchId)
-      .eq('user_id', user.id) // Ensure user can only delete their own pitches
-
+    const { error, status, message } = await deletePitch(id, user!.id)
+    
     if (error) {
-      console.error('Error deleting pitch:', error)
-      return NextResponse.json({ error: 'Failed to delete pitch' }, { status: 500 })
+      return NextResponse.json({ error }, { status })
     }
 
-    return NextResponse.json({ message: 'Pitch deleted successfully' })
+    return NextResponse.json({ message })
+
   } catch (error) {
-    console.error('API Error:', error)
+    console.error('Error in DELETE /api/pitches/[id]:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

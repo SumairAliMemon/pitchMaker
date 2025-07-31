@@ -1,6 +1,6 @@
 'use client'
 
-import { createBrowserClient } from "@supabase/ssr";
+import { supabase } from "@/lib/supabase";
 import { ArrowRight, CheckCircle, Sparkles, Upload } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -26,11 +26,6 @@ export default function Home() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const supabase = createBrowserClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        )
-
         const { data: { session } } = await supabase.auth.getSession()
         
         if (session) {

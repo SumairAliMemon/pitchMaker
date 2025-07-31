@@ -1,22 +1,10 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createSupabaseServer } from '@/lib/supabaseServer'
 import { NextRequest, NextResponse } from 'next/server'
 
 // GET /api/pitch-history - Get pitch history for authenticated user
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          }
-        }
-      }
-    )
+    const supabase = await createSupabaseServer()
 
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser()
@@ -38,9 +26,9 @@ export async function GET(request: NextRequest) {
         .select('*')
         .eq('user_id', user.id)
     } else {
-      // Use basic pitch_history table
+      // Use basic pitches table since pitch_history might not exist
       query = supabase
-        .from('pitch_history')
+        .from('pitches')
         .select('*')
         .eq('user_id', user.id)
     }
@@ -59,21 +47,10 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// DELETE /api/pitch-history/[id] - Delete a pitch history entry
+// DELETE /api/pitch-history - Delete a pitch from history
 export async function DELETE(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value
-          }
-        }
-      }
-    )
+    const supabase = await createSupabaseServer()
 
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser()
@@ -89,19 +66,19 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'historyId is required' }, { status: 400 })
     }
 
-    // Delete the pitch history entry
+    // Delete the pitch (using pitches table)
     const { error } = await supabase
-      .from('pitch_history')
+      .from('pitches')
       .delete()
       .eq('id', historyId)
-      .eq('user_id', user.id) // Ensure user can only delete their own history
+      .eq('user_id', user.id)
 
     if (error) {
-      console.error('Error deleting pitch history:', error)
-      return NextResponse.json({ error: 'Failed to delete pitch history' }, { status: 500 })
+      console.error('Error deleting pitch:', error)
+      return NextResponse.json({ error: 'Failed to delete pitch' }, { status: 500 })
     }
 
-    return NextResponse.json({ message: 'Pitch history deleted successfully' })
+    return NextResponse.json({ message: 'Pitch deleted successfully' })
   } catch (error) {
     console.error('API Error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

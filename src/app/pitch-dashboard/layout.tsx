@@ -1,6 +1,6 @@
 'use client'
 
-import { createBrowserClient } from '@supabase/ssr'
+import { supabase } from '@/lib/supabase'
 import { User } from '@supabase/supabase-js'
 import { History, Home, LogOut, User as UserIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -16,12 +16,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
-
-  // Create Supabase client for browser
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
 
   useEffect(() => {
     const getUser = async () => {
@@ -46,7 +40,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     )
 
     return () => subscription.unsubscribe()
-  }, [router, supabase.auth])
+  }, [router])
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut()

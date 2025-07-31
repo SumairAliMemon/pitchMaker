@@ -1,7 +1,7 @@
 'use client'
 
 import { profileService, UserProfile } from '@/lib/profileService'
-import { createBrowserClient } from '@supabase/ssr'
+import { supabase } from '@/lib/supabase'
 import { User } from '@supabase/supabase-js'
 import { CheckCircle, Edit, Save, User as UserIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -24,12 +24,6 @@ export default function ProfilePage() {
     education: ''
   })
   const router = useRouter()
-
-  // Create Supabase client for browser
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
 
   useEffect(() => {
     const initializeData = async () => {
@@ -74,7 +68,7 @@ export default function ProfilePage() {
     }
 
     initializeData()
-  }, [router, supabase.auth])
+  }, [router])
 
   const handleSave = async () => {
     if (!user) return
