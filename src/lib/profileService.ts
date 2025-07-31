@@ -23,10 +23,14 @@ export const profileService = {
         .single()
 
       if (error) {
+        // If no profile found, return null so the component can handle creating one
+        if (error.code === 'PGRST116') {
+          return null
+        }
         console.error('Error fetching profile:', error)
         // If table doesn't exist, provide helpful message
         if (error.message?.includes('relation "user_profiles" does not exist')) {
-          console.error('The user_profiles table does not exist. Please run the user_profiles_migration.sql file in your Supabase database.')
+          console.error('The user_profiles table does not exist. Please run the simplified_schema.sql file in your Supabase database.')
         }
         return null
       }
@@ -99,13 +103,25 @@ export const profileService = {
     }
   },
 
-  // Update specific profile fields
+  // Update specific profile fields (upsert - insert or update)
   async updateProfile(userId: string, updates: Partial<UserProfile>): Promise<UserProfile | null> {
     try {
+      // For client-side usage, we'll pass the email from the calling component
+      // Get the current user's session to verify they're authenticated
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user) {
+        console.error('No authenticated user session found')
+        return null
+      }
+
       const { data, error } = await supabase
         .from('user_profiles')
-        .update({ ...updates, updated_at: new Date().toISOString() })
-        .eq('id', userId)
+        .upsert({ 
+          id: userId,
+          email: session.user.email || '',
+          ...updates, 
+          updated_at: new Date().toISOString() 
+        })
         .select()
         .single()
 

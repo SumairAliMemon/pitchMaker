@@ -36,8 +36,10 @@ CREATE TABLE job_descriptions (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   title VARCHAR(255),
-  company VARCHAR(255),
+  company_name VARCHAR(255),
   description TEXT NOT NULL,
+  source_url TEXT,
+  is_saved BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
