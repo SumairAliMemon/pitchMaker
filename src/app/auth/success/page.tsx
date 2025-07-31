@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 function AuthSuccessContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect') || '/dashboard'
+  const redirect = searchParams.get('redirect') || '/pitch-dashboard'
 
   useEffect(() => {
     // Broadcast success to all tabs

@@ -20,7 +20,7 @@ export default function LoginPage() {
   useEffect(() => {
     const cleanup = AuthStateManager.onAuthSuccess(() => {
       // If user gets authenticated in another tab, redirect this tab too
-      router.push('/dashboard')
+      router.push('/pitch-dashboard')
     })
 
     return cleanup

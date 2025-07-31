@@ -1,12 +1,17 @@
+'use client'
+
+import { createBrowserClient } from "@supabase/ssr";
 import { ArrowRight, CheckCircle, Sparkles, Upload } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 // Add client-side auth state management for cross-tab communication
 function AuthStateListener() {
   if (typeof window !== 'undefined') {
     import('@/lib/authStateManager').then(({ AuthStateManager }) => {
       AuthStateManager.onAuthSuccess(() => {
-        window.location.href = '/dashboard'
+        window.location.href = '/pitch-dashboard'
       })
     })
   }
@@ -14,6 +19,52 @@ function AuthStateListener() {
 }
 
 export default function Home() {
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const supabase = createBrowserClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        )
+
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (session) {
+          console.log('✅ User is authenticated, redirecting to dashboard...')
+          setIsAuthenticated(true)
+          router.push('/pitch-dashboard')
+          return
+        }
+
+        console.log('ℹ️ User not authenticated, showing landing page')
+        setIsLoading(false)
+      } catch (error) {
+        console.error('Error checking auth:', error)
+        setIsLoading(false)
+      }
+    }
+
+    checkAuth()
+  }, [router])
+
+  // Show loading spinner while checking authentication
+  if (isLoading || isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-gray-50 to-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">
+            {isAuthenticated ? 'Redirecting to Dashboard...' : 'Loading...'}
+          </h2>
+          <p className="text-gray-500">Please wait</p>
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100">
       <AuthStateListener />

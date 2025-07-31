@@ -38,7 +38,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(errorMessage)
   }
 } else {
-  supabase = createClient(supabaseUrl, supabaseAnonKey)
+  // Create client with global persistence configuration to avoid multiple instances
+  supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined
+    }
+  })
 }
 
 export { supabase }
+

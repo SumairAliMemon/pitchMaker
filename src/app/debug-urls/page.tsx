@@ -62,7 +62,7 @@ export default function DebugUrls() {
             <li>Go to <a href="/login" className="underline text-blue-600">/login</a></li>
             <li>Enter your email and send magic link</li>
             <li>Check your email and click the magic link</li>
-            <li>Should redirect to /dashboard with authentication</li>
+            <li>Should redirect to /pitch-dashboard with authentication</li>
           </ol>
         </div>
 

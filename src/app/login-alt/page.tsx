@@ -62,7 +62,7 @@ export default function AlternateLoginPage() {
       } else if (data.session) {
         setMessage('Success! Redirecting...')
         setIsSuccess(true)
-        router.push('/dashboard')
+        router.push('/pitch-dashboard')
       }
     } catch (error) {
       console.error('OTP verify error:', error)

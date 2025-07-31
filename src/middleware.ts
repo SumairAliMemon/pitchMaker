@@ -51,13 +51,18 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // If user is signed in and the current path is /login or /signup redirect the user to /dashboard
-  if (session && (req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/signup')) {
-    return NextResponse.redirect(new URL('/dashboard', req.url))
+  // If user is signed in and on root path, redirect to pitch-dashboard
+  if (session && req.nextUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/pitch-dashboard', req.url))
   }
 
-  // If user is not signed in and the current path is /dashboard redirect the user to /login
-  if (!session && req.nextUrl.pathname === '/dashboard') {
+  // If user is signed in and the current path is /login redirect the user to /pitch-dashboard
+  if (session && req.nextUrl.pathname === '/login') {
+    return NextResponse.redirect(new URL('/pitch-dashboard', req.url))
+  }
+
+  // If user is not signed in and the current path is /pitch-dashboard redirect the user to /login
+  if (!session && req.nextUrl.pathname === '/pitch-dashboard') {
     return NextResponse.redirect(new URL('/login', req.url))
   }
 

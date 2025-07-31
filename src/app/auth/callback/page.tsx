@@ -39,7 +39,7 @@ export default function AuthCallback() {
 
           if (data?.session) {
             console.log('✅ Session set successfully!')
-            router.push('/dashboard')
+            router.push('/pitch-dashboard')
             return
           }
         }
@@ -61,7 +61,7 @@ export default function AuthCallback() {
 
           if (data?.session) {
             console.log('✅ Code exchange successful!')
-            router.push('/dashboard')
+            router.push('/pitch-dashboard')
             return
           }
         }

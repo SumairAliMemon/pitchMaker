@@ -97,7 +97,7 @@ export default function AuthTest() {
               <li>Click &quot;Send Magic Link&quot; above</li>
               <li>Check your email inbox</li>
               <li>Click the magic link in the email (don&apos;t copy/paste the URL)</li>
-              <li>The link should redirect you to /dashboard</li>
+              <li>The link should redirect you to /pitch-dashboard</li>
               <li>If you get &quot;no_code&quot; error, your Supabase URLs are wrong</li>
             </ol>
           </div>
