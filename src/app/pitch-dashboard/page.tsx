@@ -1,6 +1,5 @@
 'use client'
 
-import { geminiService } from '@/lib/geminiService'
 import { jobDescriptionService } from '@/lib/jobDescriptionService'
 import { pitchService } from '@/lib/pitchService'
 import { profileService, UserProfile } from '@/lib/profileService'
@@ -100,38 +99,6 @@ export default function DashboardPage() {
     return { companyName, jobTitle }
   }
 
-  const generatePersonalizedPitch = (profile: UserProfile, jobDesc: string, companyName: string, jobTitle: string) => {
-    return `Dear Hiring Manager,
-
-I am writing to express my strong interest in the ${jobTitle} position at ${companyName}. After reviewing the job requirements, I am confident that my background and experience make me an excellent candidate for this role.
-
-About My Background:
-${profile.background_details || 'I bring a diverse professional background with experience across multiple domains.'}
-
-My Relevant Experience:
-${profile.experience || 'I have gained valuable experience that directly applies to the challenges and opportunities in this role.'}
-
-Technical Skills and Expertise:
-${profile.skills ? `My technical skill set includes: ${profile.skills}` : 'I possess a comprehensive technical skill set that aligns with modern industry requirements.'}
-
-Educational Foundation:
-${profile.education || 'My educational background has provided me with a strong foundation for continuous learning and professional growth.'}
-
-Why I am Excited About This Opportunity:
-Based on the job description, I am particularly drawn to this role because it aligns perfectly with my career goals and expertise. The challenges outlined in your posting are exactly the type of problems I am passionate about solving.
-
-What I Can Contribute:
-- Immediate impact through my relevant experience and skills
-- Fresh perspectives combined with proven problem-solving abilities  
-- Strong commitment to ${companyName}'s mission and values
-- Enthusiasm for contributing to your team's continued success
-
-I would welcome the opportunity to discuss how my background and passion can contribute to ${companyName}'s objectives. Thank you for considering my application.
-
-Sincerely,
-${profile.full_name || 'Your Name'}`
-  }
-
   const copyToClipboard = async (text: string) => {
     try {
       // Clean the text by removing markdown formatting
@@ -186,29 +153,27 @@ ${profile.full_name || 'Your Name'}`
         }
       )
 
-      let generatedPitch: string
+      // Generate pitch using API endpoint
+      const response = await fetch('/api/generate-pitch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userProfile,
+          jobDescription,
+          jobTitle,
+          companyName
+        }),
+      })
 
-      // Check if Gemini API key is available
-      if (process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
-        try {
-          // Generate pitch using Gemini AI
-          generatedPitch = await geminiService.generatePitch(
-            userProfile,
-            jobDescription,
-            jobTitle,
-            companyName
-          )
-        } catch (aiError) {
-          console.error('AI generation failed, falling back to template:', aiError)
-          // Fallback to template-based generation
-          generatedPitch = generatePersonalizedPitch(userProfile, jobDescription, companyName, jobTitle)
-        }
-      } else {
-        console.warn('Gemini API key not found, using template generation')
-        // Fallback to template-based generation
-        generatedPitch = generatePersonalizedPitch(userProfile, jobDescription, companyName, jobTitle)
+      if (!response.ok) {
+        throw new Error(`API call failed: ${response.status}`)
       }
-      
+
+      const data = await response.json()
+      const generatedPitch = data.pitch
+
       setResults(generatedPitch)
 
       // Save pitch to database with job_description_id reference
