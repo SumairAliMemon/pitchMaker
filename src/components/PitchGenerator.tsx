@@ -1,6 +1,6 @@
 'use client'
 
-import { pitchHistoryService, PitchHistory } from '@/lib/pitchHistoryService'
+import { PitchHistory, pitchHistoryService } from '@/lib/pitchHistoryService'
 import { pitchService } from '@/lib/pitchService'
 import { UserProfile } from '@/lib/profileService'
 import { User } from '@supabase/supabase-js'

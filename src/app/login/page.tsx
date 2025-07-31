@@ -91,6 +91,7 @@ export default function LoginPage() {
                   required
                   className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
                   placeholder="Enter your email"
+                  suppressHydrationWarning
                 />
               </div>
             </div>
@@ -99,6 +100,7 @@ export default function LoginPage() {
               type="submit"
               disabled={loading}
               className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 px-6 rounded-2xl font-semibold hover:from-blue-600 hover:to-purple-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg"
+              suppressHydrationWarning
             >
               {loading ? (
                 <>

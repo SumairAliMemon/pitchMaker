@@ -1,6 +1,6 @@
 'use client'
 
-import { pitchHistoryService, PitchHistory } from '@/lib/pitchHistoryService'
+import { PitchHistory, pitchHistoryService } from '@/lib/pitchHistoryService'
 import { Clock, Copy, ExternalLink, History, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 
