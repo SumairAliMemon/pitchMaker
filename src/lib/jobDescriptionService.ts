@@ -37,7 +37,7 @@ export const jobDescriptionService = {
           is_saved: true
         })
         .select()
-        .single()
+        .maybeSingle()
 
       if (error) {
         console.error('Error creating job description:', error)

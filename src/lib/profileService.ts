@@ -73,6 +73,12 @@ export const profileService = {
 
       if (error) {
         console.error('Error upserting profile:', error)
+        console.error('Error details:', { 
+          message: error.message, 
+          code: error.code, 
+          details: error.details,
+          hint: error.hint
+        })
         if (error.message?.includes('relation "user_profiles" does not exist')) {
           console.error('The user_profiles table does not exist. Please run the user_profiles_migration.sql file in your Supabase database.')
         }
@@ -127,6 +133,12 @@ export const profileService = {
 
       if (error) {
         console.error('Error updating profile:', error)
+        console.error('Error details:', { 
+          message: error.message, 
+          code: error.code, 
+          details: error.details,
+          hint: error.hint
+        })
         if (error.message?.includes('relation "user_profiles" does not exist')) {
           console.error('The user_profiles table does not exist. Please run the user_profiles_migration.sql file in your Supabase database.')
         }

@@ -41,7 +41,7 @@ export const pitchService = {
           pitch_status: 'generated'
         })
         .select()
-        .single()
+        .maybeSingle()
 
       if (error) {
         console.error('Error creating pitch:', error)

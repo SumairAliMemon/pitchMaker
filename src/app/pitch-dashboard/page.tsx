@@ -1,8 +1,10 @@
 'use client'
 
+import { geminiService } from '@/lib/geminiService'
+import { jobDescriptionService } from '@/lib/jobDescriptionService'
 import { pitchService } from '@/lib/pitchService'
 import { profileService, UserProfile } from '@/lib/profileService'
-import { createBrowserClient } from '@supabase/ssr'
+import { supabase } from '@/lib/supabase'
 import { User } from '@supabase/supabase-js'
 import { AlertCircle, Briefcase, CheckCircle, Send, Sparkles } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -19,13 +21,8 @@ export default function DashboardPage() {
   const [analyzing, setAnalyzing] = useState(false)
   const [results, setResults] = useState<string | null>(null)
   const [profileIncomplete, setProfileIncomplete] = useState(false)
+  const [showFullPitch, setShowFullPitch] = useState(false)
   const router = useRouter()
-
-  // Create Supabase client for browser
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
 
   useEffect(() => {
     const initializeData = async () => {
@@ -63,7 +60,104 @@ export default function DashboardPage() {
     }
 
     initializeData()
-  }, [router, supabase.auth])
+  }, [router])
+
+  const extractCompanyAndTitle = (jobDesc: string) => {
+    // Simple extraction - you could enhance this with better parsing
+    const lines = jobDesc.split('\n').filter(line => line.trim())
+    
+    // Try to find company name (look for common patterns)
+    let companyName = 'the Company'
+    let jobTitle = 'this Position'
+    
+    for (const line of lines) {
+      // Look for company patterns
+      if (line.toLowerCase().includes('company:') || line.toLowerCase().includes('organization:')) {
+        companyName = line.split(':')[1]?.trim() || companyName
+        break
+      }
+      // Look for @company or Company Name patterns
+      const companyMatch = line.match(/(?:at|@)\s+([A-Z][a-zA-Z\s&.,-]+(?:Inc|LLC|Corp|Ltd|Co)?)/i)
+      if (companyMatch) {
+        companyName = companyMatch[1].trim()
+        break
+      }
+    }
+    
+    // Look for job title (usually in first few lines)
+    for (const line of lines.slice(0, 5)) {
+      if (line.toLowerCase().includes('position:') || line.toLowerCase().includes('role:') || line.toLowerCase().includes('title:')) {
+        jobTitle = line.split(':')[1]?.trim() || jobTitle
+        break
+      }
+      // If line looks like a job title (contains common job words)
+      if (line.match(/(?:engineer|developer|manager|analyst|designer|specialist|coordinator|director|lead|senior|junior)/i) && line.length < 100) {
+        jobTitle = line.trim()
+        break
+      }
+    }
+    
+    return { companyName, jobTitle }
+  }
+
+  const generatePersonalizedPitch = (profile: UserProfile, jobDesc: string, companyName: string, jobTitle: string) => {
+    return `Dear Hiring Manager,
+
+I am writing to express my strong interest in the ${jobTitle} position at ${companyName}. After reviewing the job requirements, I am confident that my background and experience make me an excellent candidate for this role.
+
+**About My Background:**
+${profile.background_details || 'I bring a diverse professional background with experience across multiple domains.'}
+
+**My Relevant Experience:**
+${profile.experience || 'I have gained valuable experience that directly applies to the challenges and opportunities in this role.'}
+
+**Technical Skills & Expertise:**
+${profile.skills ? `My technical skill set includes: ${profile.skills}` : 'I possess a comprehensive technical skill set that aligns with modern industry requirements.'}
+
+**Educational Foundation:**
+${profile.education || 'My educational background has provided me with a strong foundation for continuous learning and professional growth.'}
+
+**Why I'm Excited About This Opportunity:**
+Based on the job description, I am particularly drawn to this role because it aligns perfectly with my career goals and expertise. The challenges outlined in your posting are exactly the type of problems I am passionate about solving.
+
+**What I Can Contribute:**
+• Immediate impact through my relevant experience and skills
+• Fresh perspectives combined with proven problem-solving abilities  
+• Strong commitment to ${companyName}'s mission and values
+• Enthusiasm for contributing to your team's continued success
+
+I would welcome the opportunity to discuss how my background and passion can contribute to ${companyName}'s objectives. Thank you for considering my application.
+
+Best regards,
+${profile.full_name || 'Your Name'}
+
+---
+*This pitch has been personalized based on your profile and tailored specifically for the ${jobTitle} role at ${companyName}.*`
+  }
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      // Clean the text by removing markdown formatting
+      const cleanText = text
+        .replace(/\*\*/g, '') // Remove bold markdown
+        .replace(/\*/g, '')   // Remove italic markdown
+        .replace(/^---.*$/gm, '') // Remove separator lines
+        .trim()
+      
+      await navigator.clipboard.writeText(cleanText)
+      alert('✅ Pitch copied to clipboard!')
+    } catch (err) {
+      console.error('Failed to copy: ', err)
+      // Fallback: create a text area and copy
+      const textArea = document.createElement('textarea')
+      textArea.value = text.replace(/\*\*/g, '').replace(/\*/g, '')
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+      alert('✅ Pitch copied to clipboard!')
+    }
+  }
 
   const handleSubmit = async () => {
     if (!userProfile || !userProfile.background_details?.trim()) {
@@ -82,57 +176,60 @@ export default function DashboardPage() {
     setResults(null)
 
     try {
-      // Simulate AI pitch generation (replace with actual AI service)
-      await new Promise(resolve => setTimeout(resolve, 3000))
+      // Extract company name and job title from job description
+      const { companyName, jobTitle } = extractCompanyAndTitle(jobDescription)
       
-      // Mock pitch results
-      const mockPitch = `
-**Your Personalized Pitch:**
+      // First, save the job description to database
+      const savedJobDescription = await jobDescriptionService.createJobDescription(
+        user.id,
+        {
+          title: jobTitle,
+          company_name: companyName,
+          description: jobDescription
+        }
+      )
 
-Dear Hiring Manager,
+      let generatedPitch: string
 
-I am excited to apply for this position as it perfectly aligns with my background and career aspirations. Based on the job requirements, I believe I would be an excellent fit for your team.
-
-**Why I'm the Right Candidate:**
-
-✨ **Relevant Experience**: My background demonstrates strong alignment with your key requirements, particularly in the areas you've prioritized.
-
-🚀 **Technical Skills**: I bring hands-on experience with the technologies and methodologies mentioned in your job description.
-
-💡 **Problem-Solving Approach**: My experience has equipped me with the analytical thinking and creative problem-solving skills essential for this role.
-
-🤝 **Team Collaboration**: I thrive in collaborative environments and am committed to contributing positively to team dynamics and project success.
-
-**What I Can Contribute:**
-- Immediate impact through my relevant skill set
-- Fresh perspectives combined with proven experience
-- Strong commitment to continuous learning and growth
-- Enthusiasm for tackling the challenges outlined in your job description
-
-I would welcome the opportunity to discuss how my background and passion align with your team's needs. Thank you for considering my application.
-
-Best regards,
-${userProfile?.full_name || 'Your Name'}
-
----
-*This pitch has been tailored specifically for the role based on your saved profile and the job requirements.*
-      `
+      // Check if Gemini API key is available
+      if (process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
+        try {
+          // Generate pitch using Gemini AI
+          generatedPitch = await geminiService.generatePitch(
+            userProfile,
+            jobDescription,
+            jobTitle,
+            companyName
+          )
+        } catch (aiError) {
+          console.error('AI generation failed, falling back to template:', aiError)
+          // Fallback to template-based generation
+          generatedPitch = generatePersonalizedPitch(userProfile, jobDescription, companyName, jobTitle)
+        }
+      } else {
+        console.warn('Gemini API key not found, using template generation')
+        // Fallback to template-based generation
+        generatedPitch = generatePersonalizedPitch(userProfile, jobDescription, companyName, jobTitle)
+      }
       
-      setResults(mockPitch)
+      setResults(generatedPitch)
 
-      // Save to pitches table (history will be created automatically via trigger)
+      // Save pitch to database with job_description_id reference
       const savedPitch = await pitchService.createPitch(
         user.id,
         {
+          job_description_id: savedJobDescription?.id,
           job_description: jobDescription,
-          job_title: 'Position', // You could extract this from job description
-          company_name: 'Company' // You could extract this from job description
+          job_title: jobTitle,
+          company_name: companyName
         },
-        mockPitch
+        generatedPitch
       )
 
       if (savedPitch) {
-        console.log('Pitch saved successfully')
+        console.log('Pitch saved successfully to history')
+      } else {
+        console.warn('Failed to save pitch to history')
       }
     } catch (error) {
       console.error('Pitch generation failed:', error)
@@ -245,6 +342,29 @@ ${userProfile?.full_name || 'Your Name'}
             </div>
           </div>
 
+          {/* Copy and View Full Buttons */}
+          <div className="mt-4 flex justify-center space-x-3">
+            <button
+              onClick={() => copyToClipboard(results)}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl font-semibold transition-colors duration-200 flex items-center space-x-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <span>Copy Pitch</span>
+            </button>
+            <button
+              onClick={() => setShowFullPitch(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-semibold transition-colors duration-200 flex items-center space-x-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <span>View Full</span>
+            </button>
+          </div>
+
           <div className="mt-6 p-4 bg-blue-900/50 rounded-xl border border-blue-700">
             <div className="flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
@@ -255,6 +375,63 @@ ${userProfile?.full_name || 'Your Name'}
                 <p className="text-sm text-blue-200 mt-1">
                   Copy this pitch and customize it further. Check your pitch history to view and manage all your generated pitches.
                 </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Full Pitch Overlay Modal */}
+      {showFullPitch && results && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-gray-700">
+            <div className="p-6 sm:p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
+                  <Sparkles className="w-6 h-6 text-blue-400" />
+                  <span>Your Generated Pitch</span>
+                </h2>
+                <button
+                  onClick={() => setShowFullPitch(false)}
+                  className="text-gray-400 hover:text-white text-2xl transition-colors"
+                >
+                  ×
+                </button>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="bg-gray-900 rounded-xl p-6 border border-gray-600">
+                  <pre className="whitespace-pre-wrap text-gray-200 font-sans leading-relaxed">
+                    {results}
+                  </pre>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+                  <button
+                    onClick={() => copyToClipboard(results)}
+                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors duration-200 flex items-center justify-center space-x-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span>Copy to Clipboard</span>
+                  </button>
+                  <button
+                    onClick={() => router.push('/pitch-dashboard/history')}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors duration-200 flex items-center justify-center space-x-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>View History</span>
+                  </button>
+                  <button
+                    onClick={() => setShowFullPitch(false)}
+                    className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors duration-200"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           </div>
