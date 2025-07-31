@@ -1,4 +1,4 @@
-import { getPitchById, updatePitchStatus, deletePitch, getAuthenticatedUser } from '@/lib/pitchApiService'
+import { deletePitch, getAuthenticatedUser, getPitchById, updatePitchStatus } from '@/lib/pitchApiService'
 import { NextRequest, NextResponse } from 'next/server'
 
 // GET /api/pitches/[id] - Get specific pitch

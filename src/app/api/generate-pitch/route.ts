@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       userProfile = profile
     }
 
-    // Generate pitch using AI (replace this with your actual AI integration)
+    // Generate pitch using Gemini AI
     const generatedPitch = await generatePitchWithAI({
       jobDescription: job_description,
       jobTitle: job_title,
@@ -86,8 +86,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Helper function to generate pitch with AI
-// Replace this with your actual AI integration (OpenAI, Claude, etc.)
+// Helper function to generate pitch with Gemini AI
 async function generatePitchWithAI({
   jobDescription,
   jobTitle,
@@ -96,75 +95,87 @@ async function generatePitchWithAI({
 }: {
   jobDescription: string
   jobTitle?: string
-  companyName?: string
+  companyName?: string  
   userProfile: UserProfile | null
 }): Promise<string | null> {
+  const userName = userProfile?.full_name || 'Your Name'
+  const jobTitleText = jobTitle || 'Position'
+  const companyText = companyName || 'Company'
+  
   try {
-    // Create a comprehensive prompt for AI
-    let prompt = `Generate a professional and compelling pitch for the following job application:\n\n`
-    
-    if (jobTitle) prompt += `Job Title: ${jobTitle}\n`
-    if (companyName) prompt += `Company: ${companyName}\n`
-    prompt += `Job Description:\n${jobDescription}\n\n`
-    
-    if (userProfile) {
-      prompt += `Candidate Profile:\n`
-      if (userProfile.full_name) prompt += `Name: ${userProfile.full_name}\n`
-      if (userProfile.background_details) prompt += `Background: ${userProfile.background_details}\n`
-      if (userProfile.skills) prompt += `Skills: ${userProfile.skills}\n`
-      if (userProfile.experience) prompt += `Experience: ${userProfile.experience}\n`
-      if (userProfile.education) prompt += `Education: ${userProfile.education}\n`
-    }
-    
-    prompt += `\nPlease generate a personalized cover letter or pitch that:\n`
-    prompt += `1. Addresses the specific requirements mentioned in the job description\n`
-    prompt += `2. Highlights relevant experience and skills from the candidate profile\n`
-    prompt += `3. Shows enthusiasm for the role and company\n`
-    prompt += `4. Is professional yet personable\n`
-    prompt += `5. Is concise (around 200-300 words)\n\n`
-    prompt += `Generate only the pitch content, no additional formatting or explanations.`
+    // Create simple prompt
+    const prompt = `Write a professional cover letter for this job application:
 
-    // Log the prompt for debugging (remove in production)
-    console.log('AI Prompt:', prompt)
+Job Title: ${jobTitleText}
+Company: ${companyText}
+Job Description: ${jobDescription}
 
-    // TODO: Replace this with actual AI API call
-    // Example for OpenAI:
-    /*
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+Candidate Information:
+Name: ${userName}
+Background: ${userProfile?.background_details || 'Not specified'}
+Skills: ${userProfile?.skills || 'Not specified'}
+Experience: ${userProfile?.experience || 'Not specified'}
+Education: ${userProfile?.education || 'Not specified'}
+
+Write ONLY the cover letter text. No markdown formatting. No ** or * symbols. Just plain text.`
+
+    // Direct API call to Gemini
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
+        'x-goog-api-key': process.env.NEXT_PUBLIC_GEMINI_API_KEY || ''
       },
       body: JSON.stringify({
-        model: 'gpt-4',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 500,
-        temperature: 0.7,
-      }),
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt
+              }
+            ]
+          }
+        ]
+      })
     })
-    
+
+    if (!response.ok) {
+      throw new Error(`Gemini API error: ${response.status}`)
+    }
+
     const data = await response.json()
-    return data.choices[0]?.message?.content?.trim()
-    */
+    
+    if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+      let generatedText = data.candidates[0].content.parts[0].text
+      
+      // Remove all markdown formatting
+      generatedText = generatedText
+        .replace(/\*\*/g, '')  // Remove **
+        .replace(/\*/g, '')    // Remove *
+        .replace(/##/g, '')    // Remove ##
+        .replace(/#/g, '')     // Remove #
+        .trim()
+      
+      return generatedText
+    }
 
-    // Placeholder implementation - replace with your AI service
-    const placeholderPitch = `Dear Hiring Manager,
+    throw new Error('No content generated')
 
-I am writing to express my strong interest in ${jobTitle ? `the ${jobTitle} position` : 'this opportunity'} ${companyName ? `at ${companyName}` : ''}. 
+  } catch (error) {
+    console.error('Error generating pitch with Gemini:', error)
+    
+    // Simple fallback
+    return `Dear Hiring Manager,
 
-${userProfile?.background_details ? `With my background in ${userProfile.background_details}, ` : ''}I am excited about the opportunity to contribute to your team. ${userProfile?.skills ? `My skills in ${userProfile.skills} ` : ''}align well with the requirements outlined in your job description.
+I am writing to express my strong interest in the ${jobTitleText} position at ${companyText}.
 
-${userProfile?.experience ? `My experience includes ${userProfile.experience}, ` : ''}which has prepared me to tackle the challenges and responsibilities mentioned in this role. I am particularly drawn to this position because it offers the opportunity to apply my expertise while continuing to grow professionally.
+${userProfile?.background_details ? `With my background in ${userProfile.background_details}, ` : ''}I believe I would be a good fit for this role. ${userProfile?.skills ? `My skills include ${userProfile.skills}, ` : ''}which align with the requirements mentioned in the job description.
 
-I would welcome the opportunity to discuss how my background and enthusiasm can contribute to your team's success. Thank you for considering my application.
+${userProfile?.experience ? `My experience in ${userProfile.experience} ` : 'I am eager to '}contribute to your team and help achieve your goals.
+
+Thank you for considering my application.
 
 Best regards,
-${userProfile?.full_name || 'Your Name'}`
-
-    return placeholderPitch
-  } catch (error) {
-    console.error('Error generating pitch with AI:', error)
-    return null
+${userName}`
   }
 }

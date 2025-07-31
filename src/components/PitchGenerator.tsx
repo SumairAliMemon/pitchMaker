@@ -1,7 +1,6 @@
 'use client'
 
 import { PitchHistory, pitchHistoryService } from '@/lib/pitchHistoryService'
-import { pitchService } from '@/lib/pitchService'
 import { UserProfile } from '@/lib/profileService'
 import { User } from '@supabase/supabase-js'
 import { BookOpen, Briefcase, CheckCircle, Send } from 'lucide-react'
@@ -36,62 +35,39 @@ export default function PitchGenerator({
     setAnalyzing(true)
 
     try {
-      // Simulate AI pitch generation (replace with actual AI service)
-      await new Promise(resolve => setTimeout(resolve, 3000))
-      
-      // Mock pitch results
-      const mockPitch = `
-**Your Personalized Pitch:**
-
-Dear Hiring Manager,
-
-I am excited to apply for this position as it perfectly aligns with my background and career aspirations. Based on the job requirements, I believe I would be an excellent fit for your team.
-
-**Why I'm the Right Candidate:**
-
-✨ **Relevant Experience**: My background demonstrates strong alignment with your key requirements, particularly in the areas you've prioritized.
-
-🚀 **Technical Skills**: I bring hands-on experience with the technologies and methodologies mentioned in your job description.
-
-💡 **Problem-Solving Approach**: My experience has equipped me with the analytical thinking and creative problem-solving skills essential for this role.
-
-🤝 **Team Collaboration**: I thrive in collaborative environments and am committed to contributing positively to team dynamics and project success.
-
-**What I Can Contribute:**
-- Immediate impact through my relevant skill set
-- Fresh perspectives combined with proven experience
-- Strong commitment to continuous learning and growth
-- Enthusiasm for tackling the challenges outlined in your job description
-
-I would welcome the opportunity to discuss how my background and passion align with your team's needs. Thank you for considering my application.
-
-Best regards,
-${userProfile?.full_name || 'Your Name'}
-
----
-*This pitch has been tailored specifically for the role based on your saved profile and the job requirements.*
-      `
-      
-      onPitchGenerated(mockPitch)
-
-      // Save to pitches table (history will be created automatically via trigger)
-      const savedPitch = await pitchService.createPitch(
-        user.id,
-        {
-          job_description: jobDescription,
-          job_title: 'Position', // You could extract this from job description or ask user
-          company_name: 'Company' // You could extract this from job description or ask user
+      // Call the actual AI pitch generation API
+      const response = await fetch('/api/generate-pitch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        mockPitch
-      )
+        body: JSON.stringify({
+          job_description: jobDescription,
+          job_title: 'Position', // Could be extracted from job description
+          company_name: 'Company', // Could be extracted from job description
+          use_saved_profile: true
+        })
+      })
 
-      if (savedPitch) {
-        // Refresh pitch history to get the new entry
-        const updatedHistory = await pitchHistoryService.getUserPitchHistory(user.id)
-        if (updatedHistory.length > 0) {
-          onHistoryUpdate(updatedHistory[0]) // Pass the latest pitch history entry
-        }
+      if (!response.ok) {
+        throw new Error('Failed to generate pitch')
       }
+
+      const data = await response.json()
+      
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
+      // Display the generated pitch
+      onPitchGenerated(data.generated_pitch)
+
+      // Refresh pitch history
+      const updatedHistory = await pitchHistoryService.getUserPitchHistory(user.id)
+      if (updatedHistory.length > 0) {
+        onHistoryUpdate(updatedHistory[0]) // Pass the latest pitch history entry
+      }
+
     } catch (error) {
       console.error('Pitch generation failed:', error)
       onPitchGenerated('❌ Pitch generation failed. Please try again.')
