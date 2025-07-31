@@ -48,7 +48,7 @@ export const pitchService = {
         return null
       }
 
-      return data as Pitch
+      return data as unknown as Pitch
     } catch (error) {
       console.error('Error creating pitch:', error)
       return null
@@ -69,7 +69,7 @@ export const pitchService = {
         return []
       }
 
-      return data as Pitch[]
+      return data as unknown as Pitch[]
     } catch (error) {
       console.error('Error fetching pitches:', error)
       return []
@@ -90,7 +90,7 @@ export const pitchService = {
         return null
       }
 
-      return data as Pitch
+      return data  as unknown as Pitch
     } catch (error) {
       console.error('Error fetching pitch:', error)
       return null

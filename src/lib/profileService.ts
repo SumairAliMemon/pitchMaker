@@ -20,7 +20,7 @@ export const profileService = {
         .from('user_profiles')
         .select('*')
         .eq('id', userId)
-        .single()
+        .maybeSingle()
 
       if (error) {
         // If no profile found, return null so the component can handle creating one
@@ -69,7 +69,7 @@ export const profileService = {
           ignoreDuplicates: false 
         })
         .select()
-        .single()
+        .maybeSingle()
 
       if (error) {
         console.error('Error upserting profile:', error)
@@ -123,7 +123,7 @@ export const profileService = {
           updated_at: new Date().toISOString() 
         })
         .select()
-        .single()
+        .maybeSingle()
 
       if (error) {
         console.error('Error updating profile:', error)

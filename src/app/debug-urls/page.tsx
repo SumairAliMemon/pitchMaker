@@ -45,10 +45,10 @@ export default function DebugUrls() {
               <h3 className="font-semibold text-yellow-800">Redirect URLs (add both):</h3>
               <div className="space-y-1">
                 <code className="block bg-yellow-100 p-2 rounded text-sm">
-                  http://localhost:3000/auth/callback
+                    Local host
                 </code>
                 <code className="block bg-yellow-100 p-2 rounded text-sm">
-                  {productionOrigin}/auth/callback
+                   Production
                 </code>
               </div>
             </div>

@@ -33,8 +33,22 @@ export default function DashboardPage() {
       setUser(session?.user ?? null)
       
       if (session?.user) {
-        // Load user profile and check if it's complete
-        const profile = await profileService.getProfile(session.user.id)
+        // Load user profile and create one if it doesn't exist
+        let profile = await profileService.getProfile(session.user.id)
+        
+        // If no profile exists, create one automatically
+        if (!profile) {
+          profile = await profileService.upsertProfile({
+            id: session.user.id,
+            email: session.user.email || '',
+            full_name: session.user.user_metadata?.full_name || '',
+            background_details: '',
+            skills: '',
+            experience: '',
+            education: ''
+          })
+        }
+        
         setUserProfile(profile)
         
         // Check if profile is incomplete (no background details)
