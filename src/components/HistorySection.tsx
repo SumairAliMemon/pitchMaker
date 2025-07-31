@@ -20,7 +20,7 @@ export default function HistorySection({
   onHistoryUpdate 
 }: HistorySectionProps) {
   const handleDeletePitch = async (pitchId: string) => {
-    if (await pitchHistoryService.deletePitch(pitchId)) {
+    if (await pitchHistoryService.deletePitchHistory(pitchId)) {
       const updatedHistory = pitchHistory.filter(p => p.id !== pitchId)
       onHistoryUpdate(updatedHistory)
     }

@@ -29,7 +29,7 @@ export default function PitchHistoryPage() {
       
       if (session?.user) {
         // Load pitch history
-        const history = await pitchHistoryService.getUserPitches(session.user.id)
+        const history = await pitchHistoryService.getUserPitchHistory(session.user.id)
         setPitchHistory(history)
       } else {
         router.push('/login')
@@ -55,7 +55,7 @@ export default function PitchHistoryPage() {
 
   const handleDeletePitch = async (pitchId: string) => {
     if (confirm('Are you sure you want to delete this pitch? This action cannot be undone.')) {
-      const success = await pitchHistoryService.deletePitch(pitchId)
+      const success = await pitchHistoryService.deletePitchHistory(pitchId)
       if (success) {
         setPitchHistory(prev => prev.filter(p => p.id !== pitchId))
         if (selectedPitch?.id === pitchId) {
@@ -258,7 +258,7 @@ export default function PitchHistoryPage() {
                   <h3 className="text-sm font-semibold text-gray-700 mb-2">User Details Used:</h3>
                   <div className="bg-gray-50 rounded-lg p-4 max-h-32 overflow-y-auto">
                     <p className="text-gray-700 whitespace-pre-wrap text-sm">
-                      {selectedPitch.user_details}
+                      {selectedPitch.user_details_snapshot}
                     </p>
                   </div>
                 </div>

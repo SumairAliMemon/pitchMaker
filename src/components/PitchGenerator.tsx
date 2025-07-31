@@ -1,6 +1,7 @@
 'use client'
 
 import { pitchHistoryService, PitchHistory } from '@/lib/pitchHistoryService'
+import { pitchService } from '@/lib/pitchService'
 import { UserProfile } from '@/lib/profileService'
 import { User } from '@supabase/supabase-js'
 import { BookOpen, Briefcase, CheckCircle, Send } from 'lucide-react'
@@ -73,16 +74,23 @@ ${userProfile?.full_name || 'Your Name'}
       
       onPitchGenerated(mockPitch)
 
-      // Save to history
-      const savedPitch = await pitchHistoryService.savePitch(
+      // Save to pitches table (history will be created automatically via trigger)
+      const savedPitch = await pitchService.createPitch(
         user.id,
-        jobDescription,
-        userDetails,
+        {
+          job_description: jobDescription,
+          job_title: 'Position', // You could extract this from job description or ask user
+          company_name: 'Company' // You could extract this from job description or ask user
+        },
         mockPitch
       )
 
       if (savedPitch) {
-        onHistoryUpdate(savedPitch)
+        // Refresh pitch history to get the new entry
+        const updatedHistory = await pitchHistoryService.getUserPitchHistory(user.id)
+        if (updatedHistory.length > 0) {
+          onHistoryUpdate(updatedHistory[0]) // Pass the latest pitch history entry
+        }
       }
     } catch (error) {
       console.error('Pitch generation failed:', error)

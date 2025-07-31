@@ -59,7 +59,7 @@ export default function DashboardPage() {
         }
 
         // Load pitch history
-        const history = await pitchHistoryService.getUserPitches(currentUser.id)
+        const history = await pitchHistoryService.getUserPitchHistory(currentUser.id)
         setPitchHistory(history)
       } else {
         router.push('/login')
@@ -157,7 +157,7 @@ export default function DashboardPage() {
 
       <SaveJobModal
         isOpen={showSaveJobModal}
-        jobDescription="" // This needs to be passed from PitchGenerator
+        jobDescription={jobDescriptionForSave}
         userId={user.id}
         onClose={() => setShowSaveJobModal(false)}
         onSaved={handleSaveJobComplete}

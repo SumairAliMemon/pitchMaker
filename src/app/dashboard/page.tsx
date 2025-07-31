@@ -1,6 +1,7 @@
 'use client'
 
 import { PitchHistory, pitchHistoryService } from '@/lib/pitchHistoryService'
+import { pitchService } from '@/lib/pitchService'
 import { profileService, UserProfile } from '@/lib/profileService'
 import { createBrowserClient } from '@supabase/ssr'
 import { User } from '@supabase/supabase-js'
@@ -63,7 +64,7 @@ export default function DashboardPage() {
         }
 
         // Load pitch history
-        const history = await pitchHistoryService.getUserPitches(session.user.id)
+        const history = await pitchHistoryService.getUserPitchHistory(session.user.id)
         setPitchHistory(history)
       } else {
         router.push('/login')
@@ -157,16 +158,21 @@ ${userProfile?.full_name || 'Your Name'}
       
       setResults(mockPitch)
 
-      // Save to history
-      const savedPitch = await pitchHistoryService.savePitch(
+      // Save to pitches table (history will be created automatically via trigger)
+      const savedPitch = await pitchService.createPitch(
         user.id,
-        jobDescription,
-        userDetails,
+        {
+          job_description: jobDescription,
+          job_title: 'Position', // You could extract this from job description or ask user
+          company_name: 'Company' // You could extract this from job description or ask user
+        },
         mockPitch
       )
 
       if (savedPitch) {
-        setPitchHistory(prev => [savedPitch, ...prev])
+        // Refresh pitch history to show the new entry
+        const updatedHistory = await pitchHistoryService.getUserPitchHistory(user.id)
+        setPitchHistory(updatedHistory)
       }
     } catch (error) {
       console.error('Pitch generation failed:', error)
@@ -269,7 +275,7 @@ ${userProfile?.full_name || 'Your Name'}
                     </div>
                     <button
                       onClick={async () => {
-                        if (await pitchHistoryService.deletePitch(pitch.id)) {
+                        if (await pitchHistoryService.deletePitchHistory(pitch.id)) {
                           setPitchHistory(prev => prev.filter(p => p.id !== pitch.id))
                         }
                       }}

@@ -176,7 +176,7 @@ export const pitchService = {
   },
 
   // Get pitch history with details (using view)
-  async getUserPitchHistoryDetails(userId: string): Promise<any[]> {
+  async getUserPitchHistoryDetails(userId: string): Promise<Record<string, unknown>[]> {
     try {
       const { data, error } = await supabase
         .from('pitch_history_details')

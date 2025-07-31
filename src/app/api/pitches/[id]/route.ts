@@ -5,9 +5,10 @@ import { NextRequest, NextResponse } from 'next/server'
 // GET /api/pitches/[id] - Get a specific pitch
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: pitchId } = await params
     const cookieStore = await cookies()
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,8 +28,6 @@ export async function GET(
     if (userError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-
-    const pitchId = params.id
 
     // Get the pitch
     const { data: pitch, error } = await supabase
@@ -56,9 +55,10 @@ export async function GET(
 // PUT /api/pitches/[id] - Update a pitch (mainly for status updates)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: pitchId } = await params
     const cookieStore = await cookies()
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -79,7 +79,6 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const pitchId = params.id
     const body = await request.json()
     const { pitch_status } = body
 
@@ -118,9 +117,10 @@ export async function PUT(
 // DELETE /api/pitches/[id] - Delete a pitch
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: pitchId } = await params
     const cookieStore = await cookies()
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -140,8 +140,6 @@ export async function DELETE(
     if (userError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-
-    const pitchId = params.id
 
     // Delete the pitch
     const { error } = await supabase
