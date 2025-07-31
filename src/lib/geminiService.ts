@@ -32,7 +32,7 @@ export class GeminiService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-goog-api-key': this.apiKey
+          'X-goog-api-key': this.apiKey
         },
         body: JSON.stringify({
           contents: [
@@ -43,13 +43,7 @@ export class GeminiService {
                 }
               ]
             }
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1024
-          }
+          ]
         })
       })
 

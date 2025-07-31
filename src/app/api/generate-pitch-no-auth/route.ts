@@ -1,27 +1,16 @@
-import { UserProfile } from '@/lib/profileService'
-import { createSupabaseServer } from '@/lib/supabaseServer'
 import { NextRequest, NextResponse } from 'next/server'
 
-// POST /api/generate-pitch - Generate a pitch using AI
+// POST /api/generate-pitch-no-auth - Test pitch generation without authentication
+// THIS IS FOR TESTING ONLY - REMOVE IN PRODUCTION
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createSupabaseServer()
-
-    // Get current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
-    
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     // Parse request body
     const body = await request.json()
     const { 
       job_description, 
       job_title, 
       company_name, 
-      job_description_id,
-      use_saved_profile = true
+      user_profile
     } = body
 
     // Validate required fields
@@ -32,24 +21,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get user profile for personalization
-    let userProfile = null
-    if (use_saved_profile) {
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
-      
-      userProfile = profile
-    }
-
-    // Generate pitch using Gemini AI
+    // Generate pitch using Gemini AI without auth
     const generatedPitch = await generatePitchWithAI({
       jobDescription: job_description,
       jobTitle: job_title,
       companyName: company_name,
-      userProfile: userProfile
+      userProfile: user_profile
     })
 
     if (!generatedPitch) {
@@ -58,37 +35,17 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
-    // Save the generated pitch to database
-    const { data: pitch, error: pitchError } = await supabase
-      .from('pitches')
-      .insert({
-        user_id: user.id,
-        job_description_id: job_description_id || null,
-        job_title: job_title || null,
-        company_name: company_name || null,
-        raw_job_description: job_description,
-        generated_pitch: generatedPitch,
-        pitch_status: 'generated'
-      })
-      .select()
-      .single()
-
-    if (pitchError) {
-      console.error('Error saving pitch:', pitchError)
-      return NextResponse.json({ error: 'Failed to save pitch' }, { status: 500 })
-    }
-
     return NextResponse.json({ 
-      pitch: pitch,
-      generated_pitch: generatedPitch
-    }, { status: 201 })
+      generated_pitch: generatedPitch,
+      note: "THIS IS A TEST ENDPOINT - NO DATABASE SAVE, NO AUTH CHECK"
+    }, { status: 200 })
   } catch (error) {
     console.error('API Error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-// Helper function to generate pitch with Gemini AI
+// Helper function to generate pitch with Gemini AI (same as main endpoint)
 async function generatePitchWithAI({
   jobDescription,
   jobTitle,
@@ -98,7 +55,13 @@ async function generatePitchWithAI({
   jobDescription: string
   jobTitle?: string
   companyName?: string  
-  userProfile: UserProfile | null
+  userProfile?: {
+    full_name?: string
+    background_details?: string
+    skills?: string
+    experience?: string
+    education?: string
+  } | null
 }): Promise<string | null> {
   const userName = userProfile?.full_name || 'Your Name'
   const jobTitleText = jobTitle || 'Position'

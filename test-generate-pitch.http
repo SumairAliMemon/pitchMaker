@@ -4,6 +4,24 @@
 ### 0. Get User Session Token (Alternative Method)
 GET http://localhost:3000/api/auth-status
 # This will show you the current user session and token if logged in
+# If you get "Auth session missing!" - you need to login first
+
+### 0.1 Test WITHOUT Authentication (Temporary)
+POST http://localhost:3000/api/generate-pitch-no-auth
+Content-Type: application/json
+
+{
+  "job_description": "We are looking for a Full Stack Developer with experience in React, Node.js, and MongoDB. The candidate should have strong problem-solving skills.",
+  "job_title": "Full Stack Developer",
+  "company_name": "Tech Solutions Inc",
+  "user_profile": {
+    "full_name": "Sumair",
+    "background_details": "AI Engineer",
+    "skills": "MERN Stack",
+    "experience": "Software Development",
+    "education": "Fast NUCES"
+  }
+}
 
 ### 1. Test Pitch Generation with Full Profile
 POST http://localhost:3000/api/generate-pitch
@@ -51,9 +69,26 @@ Authorization: Bearer YOUR_JWT_TOKEN_HERE
 }
 
 ### 5. Test Direct Gemini API (for debugging)
-POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent
+POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
 Content-Type: application/json
-x-goog-api-key: AIzaSyApeU7dGzKFodIYkqOUOM0-SetHQ-jVPXIe
+X-goog-api-key: {{$dotenv NEXT_PUBLIC_GEMINI_API_KEY}}
+
+{
+  "contents": [
+    {
+      "parts": [
+        {
+          "text": "Explain how AI works in a few words"
+        }
+      ]
+    }
+  ]
+}
+
+### 5.1 Test Gemini API with Full Prompt
+POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+Content-Type: application/json
+X-goog-api-key: {{$dotenv NEXT_PUBLIC_GEMINI_API_KEY}}
 
 {
   "contents": [
@@ -64,13 +99,7 @@ x-goog-api-key: AIzaSyApeU7dGzKFodIYkqOUOM0-SetHQ-jVPXIe
         }
       ]
     }
-  ],
-  "generationConfig": {
-    "temperature": 0.7,
-    "topK": 40,
-    "topP": 0.95,
-    "maxOutputTokens": 1024
-  }
+  ]
 }
 
 ###
