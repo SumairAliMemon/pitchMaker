@@ -1,0 +1,62 @@
+### Test New Simplified Pitch Generation Flow
+### The API now handles everything: saves job description, fetches profile, generates pitch
+
+@baseUrl = http://localhost:3000/api
+
+### 1. Generate Pitch - Only send job description (API handles the rest)
+POST {{baseUrl}}/generate-pitch
+Content-Type: application/json
+
+{
+  "job_description": "We are looking for a Senior Full Stack Developer with 5+ years of experience in React, Node.js, TypeScript, and PostgreSQL. The ideal candidate will have experience building scalable web applications, working with REST APIs, and implementing responsive designs. You'll work with our agile development team to deliver high-quality software solutions. Strong problem-solving skills and excellent communication abilities are required. Remote work available with competitive salary and benefits package."
+}
+
+### 2. Generate Pitch - Minimal job description  
+POST {{baseUrl}}/generate-pitch
+Content-Type: application/json
+
+{
+  "job_description": "Frontend developer needed. Must know React and TypeScript. Startup environment, fast-paced, competitive salary."
+}
+
+### 3. Generate Pitch - Job description with company info embedded
+POST {{baseUrl}}/generate-pitch
+Content-Type: application/json
+
+{
+  "job_description": "Company: TechCorp Inc\nPosition: Backend Engineer\n\nWe are seeking a talented Backend Engineer to join our team. The role involves:\n- Building scalable APIs with Node.js\n- Database design with MongoDB\n- Working with microservices architecture\n- Collaborating with frontend teams\n\nRequirements:\n- 3+ years backend development\n- Strong knowledge of Node.js and MongoDB\n- Experience with Docker and AWS\n- Bachelor's degree in Computer Science"
+}
+
+### 4. Test validation - No job description (should fail)
+POST {{baseUrl}}/generate-pitch
+Content-Type: application/json
+
+{
+  "title": "Some Job"
+}
+
+### 5. Test validation - Empty job description (should fail)
+POST {{baseUrl}}/generate-pitch
+Content-Type: application/json
+
+{
+  "job_description": ""
+}
+
+### 6. Check saved job descriptions (should show the ones created above)
+GET {{baseUrl}}/job-descriptions
+
+### Expected Flow:
+# 1. Frontend sends only job_description text
+# 2. API extracts company name and job title automatically  
+# 3. API saves job description to database
+# 4. API fetches user profile from database
+# 5. API sends both to Gemini for pitch generation
+# 6. API saves generated pitch to database
+# 7. API returns generated pitch to frontend
+
+### Notes:
+# - User must be authenticated (login through web app first)
+# - User profile must exist (complete profile first)
+# - Much simpler frontend - just send job description text!
+# - API handles all the complex logic

@@ -2,6 +2,44 @@ import { UserProfile } from '@/lib/profileService'
 import { createSupabaseServer } from '@/lib/supabaseServer'
 import { NextRequest, NextResponse } from 'next/server'
 
+// Helper function to extract company name and job title from job description
+function extractCompanyAndTitle(jobDesc: string) {
+  const lines = jobDesc.split('\n').filter(line => line.trim())
+  
+  let companyName = null
+  let jobTitle = null
+  
+  for (const line of lines) {
+    // Look for company patterns
+    if (line.toLowerCase().includes('company:') || line.toLowerCase().includes('organization:')) {
+      companyName = line.split(':')[1]?.trim() || null
+      continue
+    }
+    
+    // Look for @company or Company Name patterns
+    const companyMatch = line.match(/(?:at|@)\s+([A-Z][a-zA-Z\s&.,-]+(?:Inc|LLC|Corp|Ltd|Co)?)/i)
+    if (companyMatch && !companyName) {
+      companyName = companyMatch[1].trim()
+      continue
+    }
+  }
+  
+  // Look for job title (usually in first few lines)
+  for (const line of lines.slice(0, 5)) {
+    if (line.toLowerCase().includes('position:') || line.toLowerCase().includes('role:') || line.toLowerCase().includes('title:')) {
+      jobTitle = line.split(':')[1]?.trim() || null
+      break
+    }
+    // If line looks like a job title (contains common job words)
+    if (line.match(/(?:engineer|developer|manager|analyst|designer|specialist|coordinator|director|lead|senior|junior)/i) && line.length < 100) {
+      jobTitle = line.trim()
+      break
+    }
+  }
+  
+  return { companyName, jobTitle }
+}
+
 // POST /api/generate-pitch - Generate a pitch using AI
 export async function POST(request: NextRequest) {
   try {
@@ -14,16 +52,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Parse request body
+    // Parse request body - only job description needed
     const body = await request.json()
-    const { 
-      job_description, 
-      job_title, 
-      company_name, 
-      job_description_id,
-      use_saved_profile = true,
-      userProfile: providedUserProfile
-    } = body
+    const { job_description } = body
 
     // Validate required fields - only job_description is mandatory
     if (!job_description || job_description.trim() === '') {
@@ -33,27 +64,44 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get user profile for personalization
-    let userProfile = null
-    if (providedUserProfile) {
-      // Use profile data sent from client
-      userProfile = providedUserProfile
-    } else if (use_saved_profile) {
-      // Fetch profile from database
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
-      
-      userProfile = profile
+    // Extract company name and job title from job description
+    const { companyName, jobTitle } = extractCompanyAndTitle(job_description)
+
+    // Save job description to database first
+    const { data: savedJobDescription, error: jobError } = await supabase
+      .from('job_descriptions')
+      .insert({
+        user_id: user.id,
+        title: jobTitle || null,
+        company_name: companyName || null,
+        description: job_description.trim(),
+        is_saved: true
+      })
+      .select()
+      .single()
+
+    if (jobError) {
+      console.error('Error saving job description:', jobError)
+      return NextResponse.json({ error: 'Failed to save job description' }, { status: 500 })
     }
 
-    // Generate pitch using Gemini AI
+    // Get user profile from database
+    const { data: userProfile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+
+    if (profileError || !userProfile) {
+      console.error('Error fetching user profile:', profileError)
+      return NextResponse.json({ error: 'User profile not found. Please complete your profile first.' }, { status: 400 })
+    }
+
+    // Generate pitch using Gemini AI  
     const generatedPitch = await generatePitchWithAI({
       jobDescription: job_description,
-      jobTitle: job_title,
-      companyName: company_name,
+      jobTitle: jobTitle || undefined,
+      companyName: companyName || undefined, 
       userProfile: userProfile
     })
 
@@ -68,9 +116,9 @@ export async function POST(request: NextRequest) {
       .from('pitches')
       .insert({
         user_id: user.id,
-        job_description_id: job_description_id || null,
-        job_title: job_title?.trim() || null,
-        company_name: company_name?.trim() || null,
+        job_description_id: savedJobDescription?.id || null,
+        job_title: jobTitle?.trim() || null,
+        company_name: companyName?.trim() || null,
         raw_job_description: job_description,
         generated_pitch: generatedPitch,
         pitch_status: 'generated'

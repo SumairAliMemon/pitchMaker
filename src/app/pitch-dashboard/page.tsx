@@ -1,7 +1,5 @@
 'use client'
 
-import { jobDescriptionService } from '@/lib/jobDescriptionService'
-import { pitchService } from '@/lib/pitchService'
 import { profileService, UserProfile } from '@/lib/profileService'
 import { supabase } from '@/lib/supabase'
 import { User } from '@supabase/supabase-js'
@@ -61,45 +59,6 @@ export default function DashboardPage() {
     initializeData()
   }, [router])
 
-  const extractCompanyAndTitle = (jobDesc: string) => {
-    // Simple extraction - you could enhance this with better parsing
-    const lines = jobDesc.split('\n').filter(line => line.trim())
-    
-    // Try to find company name and job title (optional)
-    let companyName = null
-    let jobTitle = null
-    
-    for (const line of lines) {
-      // Look for company patterns
-      if (line.toLowerCase().includes('company:') || line.toLowerCase().includes('organization:')) {
-        companyName = line.split(':')[1]?.trim() || null
-        continue
-      }
-      
-      // Look for @company or Company Name patterns
-      const companyMatch = line.match(/(?:at|@)\s+([A-Z][a-zA-Z\s&.,-]+(?:Inc|LLC|Corp|Ltd|Co)?)/i)
-      if (companyMatch && !companyName) {
-        companyName = companyMatch[1].trim()
-        continue
-      }
-    }
-    
-    // Look for job title (usually in first few lines)
-    for (const line of lines.slice(0, 5)) {
-      if (line.toLowerCase().includes('position:') || line.toLowerCase().includes('role:') || line.toLowerCase().includes('title:')) {
-        jobTitle = line.split(':')[1]?.trim() || null
-        break
-      }
-      // If line looks like a job title (contains common job words)
-      if (line.match(/(?:engineer|developer|manager|analyst|designer|specialist|coordinator|director|lead|senior|junior)/i) && line.length < 100) {
-        jobTitle = line.trim()
-        break
-      }
-    }
-    
-    return { companyName, jobTitle }
-  }
-
   const copyToClipboard = async (text: string) => {
     try {
       // Clean the text by removing markdown formatting
@@ -141,30 +100,14 @@ export default function DashboardPage() {
     setResults(null)
 
     try {
-      // Extract company name and job title from job description
-      const { companyName, jobTitle } = extractCompanyAndTitle(jobDescription)
-      
-      // First, save the job description to database
-      const savedJobDescription = await jobDescriptionService.createJobDescription(
-        user.id,
-        {
-          title: jobTitle || undefined,
-          company_name: companyName || undefined,
-          description: jobDescription
-        }
-      )
-
-      // Generate pitch using API endpoint
+      // Generate pitch using API endpoint (API will handle job description saving and profile fetching)
       const response = await fetch('/api/generate-pitch', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userProfile,
-          job_description: jobDescription,
-          job_title: jobTitle || undefined,
-          company_name: companyName || undefined
+          job_description: jobDescription
         }),
       })
 
@@ -173,27 +116,9 @@ export default function DashboardPage() {
       }
 
       const data = await response.json()
-      const generatedPitch = data.pitch
+      const generatedPitch = data.generated_pitch || data.pitch
 
       setResults(generatedPitch)
-
-      // Save pitch to database with job_description_id reference
-      const savedPitch = await pitchService.createPitch(
-        user.id,
-        {
-          job_description_id: savedJobDescription?.id,
-          job_description: jobDescription,
-          job_title: jobTitle || undefined,
-          company_name: companyName || undefined
-        },
-        generatedPitch
-      )
-
-      if (savedPitch) {
-        console.log('Pitch saved successfully to history')
-      } else {
-        console.warn('Failed to save pitch to history')
-      }
     } catch (error) {
       console.error('Pitch generation failed:', error)
       setResults('❌ Pitch generation failed. Please try again.')
