@@ -21,11 +21,12 @@ export async function POST(request: NextRequest) {
       job_title, 
       company_name, 
       job_description_id,
-      use_saved_profile = true
+      use_saved_profile = true,
+      userProfile: providedUserProfile
     } = body
 
-    // Validate required fields
-    if (!job_description) {
+    // Validate required fields - only job_description is mandatory
+    if (!job_description || job_description.trim() === '') {
       return NextResponse.json(
         { error: 'job_description is required' }, 
         { status: 400 }
@@ -34,7 +35,11 @@ export async function POST(request: NextRequest) {
 
     // Get user profile for personalization
     let userProfile = null
-    if (use_saved_profile) {
+    if (providedUserProfile) {
+      // Use profile data sent from client
+      userProfile = providedUserProfile
+    } else if (use_saved_profile) {
+      // Fetch profile from database
       const { data: profile } = await supabase
         .from('user_profiles')
         .select('*')
@@ -64,8 +69,8 @@ export async function POST(request: NextRequest) {
       .insert({
         user_id: user.id,
         job_description_id: job_description_id || null,
-        job_title: job_title || null,
-        company_name: company_name || null,
+        job_title: job_title?.trim() || null,
+        company_name: company_name?.trim() || null,
         raw_job_description: job_description,
         generated_pitch: generatedPitch,
         pitch_status: 'generated'
@@ -101,15 +106,11 @@ async function generatePitchWithAI({
   userProfile: UserProfile | null
 }): Promise<string | null> {
   const userName = userProfile?.full_name || 'Your Name'
-  const jobTitleText = jobTitle || 'Position'
-  const companyText = companyName || 'Company'
   
   try {
-    // Create simple prompt
-    const prompt = `Write a professional cover letter for this job application:
+    // Create flexible prompt that works with or without company/title info
+    let prompt = `Write a professional cover letter for this job application:
 
-Job Title: ${jobTitleText}
-Company: ${companyText}
 Job Description: ${jobDescription}
 
 Candidate Information:
@@ -117,7 +118,25 @@ Name: ${userName}
 Background: ${userProfile?.background_details || 'Not specified'}
 Skills: ${userProfile?.skills || 'Not specified'}
 Experience: ${userProfile?.experience || 'Not specified'}
-Education: ${userProfile?.education || 'Not specified'}
+Education: ${userProfile?.education || 'Not specified'}`
+
+    // Add company and title info if available
+    if (companyName) {
+      prompt = `Write a professional cover letter for this job application:
+
+Company: ${companyName}
+${jobTitle ? `Job Title: ${jobTitle}` : ''}
+Job Description: ${jobDescription}
+
+Candidate Information:
+Name: ${userName}
+Background: ${userProfile?.background_details || 'Not specified'}
+Skills: ${userProfile?.skills || 'Not specified'}
+Experience: ${userProfile?.experience || 'Not specified'}
+Education: ${userProfile?.education || 'Not specified'}`
+    }
+
+    prompt += `
 
 Write ONLY the cover letter text. No markdown formatting. No ** or * symbols. Just plain text.`
 

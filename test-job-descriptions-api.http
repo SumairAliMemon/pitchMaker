@@ -1,0 +1,60 @@
+### Test Job Descriptions API Operations
+### Make sure to replace SESSION_TOKEN with actual session token from browser cookies
+
+@baseUrl = http://localhost:3000/api
+@sessionToken = YOUR_SESSION_TOKEN_HERE
+
+### 1. GET all job descriptions (should be empty initially)
+GET {{baseUrl}}/job-descriptions
+Cookie: sb-cqyhmjhufhqvuanwdlrc-auth-token={{sessionToken}}
+
+### 2. POST - Create a new job description with all fields
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+Cookie: sb-cqyhmjhufhqvuanwdlrc-auth-token={{sessionToken}}
+
+{
+  "title": "Full Stack Developer",
+  "company_name": "TechCorp Inc",
+  "description": "We are looking for a Full Stack Developer with experience in React, Node.js, and MongoDB. The ideal candidate should have 3+ years of experience building scalable web applications.",
+  "source_url": "https://example.com/job-posting"
+}
+
+### 3. POST - Create job description with only description (minimal required)
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+Cookie: sb-cqyhmjhufhqvuanwdlrc-auth-token={{sessionToken}}
+
+{
+  "description": "We need a backend developer skilled in Node.js and database design. Experience with microservices architecture preferred."
+}
+
+### 4. POST - Test validation (should fail - no description)
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+Cookie: sb-cqyhmjhufhqvuanwdlrc-auth-token={{sessionToken}}
+
+{
+  "title": "Software Engineer",
+  "company_name": "Some Company"
+}
+
+### 5. GET all job descriptions again (should show created ones)
+GET {{baseUrl}}/job-descriptions
+Cookie: sb-cqyhmjhufhqvuanwdlrc-auth-token={{sessionToken}}
+
+### 6. DELETE a job description (replace JOB_ID with actual ID from GET response)
+DELETE {{baseUrl}}/job-descriptions?id=JOB_ID_HERE
+Cookie: sb-cqyhmjhufhqvuanwdlrc-auth-token={{sessionToken}}
+
+### 7. DELETE with invalid ID (should fail)
+DELETE {{baseUrl}}/job-descriptions?id=invalid-id-123
+Cookie: sb-cqyhmjhufhqvuanwdlrc-auth-token={{sessionToken}}
+
+### 8. DELETE without ID (should fail)
+DELETE {{baseUrl}}/job-descriptions
+Cookie: sb-cqyhmjhufhqvuanwdlrc-auth-token={{sessionToken}}
+
+### 9. Final GET to verify operations
+GET {{baseUrl}}/job-descriptions
+Cookie: sb-cqyhmjhufhqvuanwdlrc-auth-token={{sessionToken}}

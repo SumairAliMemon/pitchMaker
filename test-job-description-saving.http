@@ -1,0 +1,45 @@
+### Test job description saving via API
+POST http://localhost:3000/api/generate-pitch-no-auth
+Content-Type: application/json
+
+{
+  "job_description": "We are looking for a Senior Software Engineer to join our team at TechCorp. The role involves:\n\n- Building scalable web applications using React and Node.js\n- Working with cross-functional teams\n- Leading technical decisions\n- Mentoring junior developers\n\nRequirements:\n- 5+ years of JavaScript experience\n- Experience with React, Node.js, MongoDB\n- Strong problem-solving skills",
+  "company_name": "TechCorp Inc",
+  "job_title": "Senior Software Engineer",
+  "userProfile": {
+    "full_name": "John Doe",
+    "background_details": "MERN stack developer with 3 years of experience building web applications",
+    "skills": "React, Node.js, MongoDB, Express.js, JavaScript, TypeScript, AWS",
+    "experience": "Built multiple full-stack web applications, worked in agile teams",
+    "education": "Bachelor's in Computer Science"
+  }
+}
+
+### Test job description saving with only job description (no company/title)
+POST http://localhost:3000/api/generate-pitch-no-auth
+Content-Type: application/json
+
+{
+  "job_description": "Looking for a developer with React experience. Must have good communication skills and ability to work in a team environment. Remote work available.",
+  "userProfile": {
+    "full_name": "Jane Smith",
+    "background_details": "Frontend developer specializing in React applications",
+    "skills": "React, JavaScript, CSS, HTML, Git",
+    "experience": "2 years building user interfaces",
+    "education": "Self-taught developer"
+  }
+}
+
+### Check if job descriptions are being saved - Get recent job descriptions
+GET http://localhost:3000/api/job-descriptions/test
+
+### Test creating job description directly
+POST http://localhost:3000/api/job-descriptions
+Content-Type: application/json
+
+{
+  "title": "Backend Developer",
+  "company_name": "StartupXYZ",
+  "description": "We need a backend developer proficient in Node.js and Python. Experience with microservices architecture preferred.",
+  "source_url": "https://example.com/job"
+}

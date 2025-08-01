@@ -1,0 +1,47 @@
+### Test pitch generation with ONLY job description (no company/title)
+POST http://localhost:3000/api/generate-pitch-no-auth
+Content-Type: application/json
+
+{
+  "job_description": "We are looking for a software engineer with experience in React, Node.js, and database design. The role involves building web applications and working with cross-functional teams to deliver high-quality software solutions.",
+  "userProfile": {
+    "full_name": "John Doe",
+    "background_details": "MERN stack developer with 3 years of experience",
+    "skills": "React, Node.js, MongoDB, Express.js, JavaScript, TypeScript",
+    "experience": "Built multiple full-stack web applications using MERN stack",
+    "education": "Bachelor's in Computer Science"
+  }
+}
+
+### Test pitch generation with job description + company name
+POST http://localhost:3000/api/generate-pitch-no-auth
+Content-Type: application/json
+
+{
+  "job_description": "We are looking for a software engineer with experience in React, Node.js, and database design. The role involves building web applications and working with cross-functional teams to deliver high-quality software solutions.",
+  "company_name": "TechCorp Inc",
+  "userProfile": {
+    "full_name": "John Doe",
+    "background_details": "MERN stack developer with 3 years of experience",
+    "skills": "React, Node.js, MongoDB, Express.js, JavaScript, TypeScript",
+    "experience": "Built multiple full-stack web applications using MERN stack",
+    "education": "Bachelor's in Computer Science"
+  }
+}
+
+### Test pitch generation with job description + company + job title
+POST http://localhost:3000/api/generate-pitch-no-auth
+Content-Type: application/json
+
+{
+  "job_description": "We are looking for a software engineer with experience in React, Node.js, and database design. The role involves building web applications and working with cross-functional teams to deliver high-quality software solutions.",
+  "company_name": "TechCorp Inc",
+  "job_title": "Senior Full Stack Developer",
+  "userProfile": {
+    "full_name": "John Doe",
+    "background_details": "MERN stack developer with 3 years of experience",
+    "skills": "React, Node.js, MongoDB, Express.js, JavaScript, TypeScript",
+    "experience": "Built multiple full-stack web applications using MERN stack",
+    "education": "Bachelor's in Computer Science"
+  }
+}

@@ -1,0 +1,137 @@
+### Complete Job Description API Test Suite
+### This tests all job description operations
+
+@baseUrl = http://localhost:3000/api
+
+### ========== BASIC OPERATIONS ==========
+
+### 1. GET - Check initial job descriptions (should work if authenticated)
+GET {{baseUrl}}/job-descriptions
+
+### 2. POST - Create job description with all fields
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+
+{
+  "title": "Senior Full Stack Developer",
+  "company_name": "TechCorp Inc", 
+  "description": "We are looking for a senior full stack developer with experience in React, Node.js, and PostgreSQL. Must have 5+ years experience building scalable web applications.",
+  "source_url": "https://example.com/job-posting"
+}
+
+### 3. POST - Create job description with minimal data (only description)
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+
+{
+  "description": "Frontend developer needed for startup. Must know React and TypeScript. Remote work available."
+}
+
+### 4. POST - Create another job description for testing
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+
+{
+  "title": "Backend Engineer",
+  "company_name": "StartupXYZ",
+  "description": "Looking for a backend engineer with Node.js and MongoDB experience. Join our growing team!"
+}
+
+### 5. GET - Retrieve all job descriptions (should show the 3 created above)
+GET {{baseUrl}}/job-descriptions
+
+### ========== VALIDATION TESTS ==========
+
+### 6. POST - Test validation error (missing description)
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+
+{
+  "title": "Some Job",
+  "company_name": "Some Company"
+}
+
+### 7. POST - Test with empty description
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+
+{
+  "title": "Another Job",
+  "description": ""
+}
+
+### 8. POST - Test with only whitespace description
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+
+{
+  "description": "   "
+}
+
+### ========== DELETE OPERATIONS ==========
+
+### 9. DELETE - Test missing ID parameter
+DELETE {{baseUrl}}/job-descriptions
+
+### 10. DELETE - Test with invalid ID
+DELETE {{baseUrl}}/job-descriptions?id=invalid-id-123
+
+### 11. DELETE - Replace JOB_ID_HERE with actual ID from GET response above
+DELETE {{baseUrl}}/job-descriptions?id=JOB_ID_HERE
+
+### 12. GET - Verify deletion worked
+GET {{baseUrl}}/job-descriptions
+
+### ========== PITCH GENERATION TEST ==========
+
+### 13. Generate pitch with job description (this should also save job description)
+POST {{baseUrl}}/generate-pitch
+Content-Type: application/json
+
+{
+  "job_description": "We are seeking a MERN Stack Developer to join our dynamic team. The ideal candidate will have experience with MongoDB, Express.js, React, and Node.js. Responsibilities include building responsive web applications, API development, and database design.",
+  "job_title": "MERN Stack Developer",
+  "company_name": "Innovation Labs",
+  "userProfile": {
+    "full_name": "John Doe",
+    "background_details": "Full-stack developer with 3 years of experience in MERN stack development",
+    "skills": "MongoDB, Express.js, React, Node.js, JavaScript, TypeScript, AWS",
+    "experience": "Built multiple full-stack applications including e-commerce platforms and social media apps",
+    "education": "Bachelor's in Computer Science"
+  }
+}
+
+### 14. GET - Check if job description was saved from pitch generation
+GET {{baseUrl}}/job-descriptions
+
+### ========== EDGE CASES ==========
+
+### 15. POST - Test with very long description
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+
+{
+  "title": "Software Engineer",
+  "company_name": "BigTech Corp",
+  "description": "This is a very long job description that tests how the system handles large amounts of text. We are looking for an exceptional software engineer who can work with multiple technologies including but not limited to JavaScript, Python, Java, C++, React, Angular, Vue.js, Node.js, Express.js, Django, Flask, Spring Boot, PostgreSQL, MongoDB, Redis, AWS, Docker, Kubernetes, and many more technologies. The candidate should have excellent problem-solving skills, strong communication abilities, and the capability to work in a fast-paced environment with tight deadlines."
+}
+
+### 16. POST - Test with special characters in company name
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+
+{
+  "title": "DevOps Engineer",
+  "company_name": "Tech & Innovation Co., Ltd.",
+  "description": "DevOps position with competitive salary. Must know AWS, Docker, and Kubernetes."
+}
+
+### 17. Final GET - See all job descriptions
+GET {{baseUrl}}/job-descriptions
+
+### ========== INSTRUCTIONS ==========
+# To run these tests:
+# 1. Make sure your Next.js server is running (npm run dev)
+# 2. Make sure you're authenticated (login through the web app first)
+# 3. Replace JOB_ID_HERE in test #11 with an actual job description ID from the GET responses
+# 4. Run each test and verify the responses

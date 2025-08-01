@@ -65,28 +65,29 @@ export default function DashboardPage() {
     // Simple extraction - you could enhance this with better parsing
     const lines = jobDesc.split('\n').filter(line => line.trim())
     
-    // Try to find company name (look for common patterns)
-    let companyName = 'the Company'
-    let jobTitle = 'this Position'
+    // Try to find company name and job title (optional)
+    let companyName = null
+    let jobTitle = null
     
     for (const line of lines) {
       // Look for company patterns
       if (line.toLowerCase().includes('company:') || line.toLowerCase().includes('organization:')) {
-        companyName = line.split(':')[1]?.trim() || companyName
-        break
+        companyName = line.split(':')[1]?.trim() || null
+        continue
       }
+      
       // Look for @company or Company Name patterns
       const companyMatch = line.match(/(?:at|@)\s+([A-Z][a-zA-Z\s&.,-]+(?:Inc|LLC|Corp|Ltd|Co)?)/i)
-      if (companyMatch) {
+      if (companyMatch && !companyName) {
         companyName = companyMatch[1].trim()
-        break
+        continue
       }
     }
     
     // Look for job title (usually in first few lines)
     for (const line of lines.slice(0, 5)) {
       if (line.toLowerCase().includes('position:') || line.toLowerCase().includes('role:') || line.toLowerCase().includes('title:')) {
-        jobTitle = line.split(':')[1]?.trim() || jobTitle
+        jobTitle = line.split(':')[1]?.trim() || null
         break
       }
       // If line looks like a job title (contains common job words)
@@ -147,8 +148,8 @@ export default function DashboardPage() {
       const savedJobDescription = await jobDescriptionService.createJobDescription(
         user.id,
         {
-          title: jobTitle,
-          company_name: companyName,
+          title: jobTitle || undefined,
+          company_name: companyName || undefined,
           description: jobDescription
         }
       )
@@ -161,9 +162,9 @@ export default function DashboardPage() {
         },
         body: JSON.stringify({
           userProfile,
-          jobDescription,
-          jobTitle,
-          companyName
+          job_description: jobDescription,
+          job_title: jobTitle || undefined,
+          company_name: companyName || undefined
         }),
       })
 
@@ -182,8 +183,8 @@ export default function DashboardPage() {
         {
           job_description_id: savedJobDescription?.id,
           job_description: jobDescription,
-          job_title: jobTitle,
-          company_name: companyName
+          job_title: jobTitle || undefined,
+          company_name: companyName || undefined
         },
         generatedPitch
       )

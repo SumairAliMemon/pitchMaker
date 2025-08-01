@@ -1,0 +1,50 @@
+### Test Job Descriptions API - Main endpoint only
+### This tests the main /api/job-descriptions endpoint
+
+@baseUrl = http://localhost:3000/api
+
+### 1. GET all job descriptions (requires auth)
+GET {{baseUrl}}/job-descriptions
+
+### 2. POST - Create a new job description (requires auth)
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+
+{
+  "title": "Senior Full Stack Developer",
+  "company_name": "TechCorp Inc",
+  "description": "We are looking for a senior full stack developer with experience in React, Node.js, and PostgreSQL. The ideal candidate will have 5+ years of experience building scalable web applications.",
+  "source_url": "https://example.com/job-posting"
+}
+
+### 3. POST - Create job description with minimal data (only description required)
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+
+{
+  "description": "Frontend developer needed for startup. Must know React and TypeScript."
+}
+
+### 4. POST - Test validation (should fail - no description)
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+
+{
+  "title": "Some Job",
+  "company_name": "Some Company"
+}
+
+### 5. GET all job descriptions (should show created ones)
+GET {{baseUrl}}/job-descriptions
+
+### 6. DELETE a job description (replace JOB_ID with actual ID from GET response)
+DELETE {{baseUrl}}/job-descriptions?id=JOB_ID_HERE
+
+### 7. DELETE non-existent job description (should return 404)
+DELETE {{baseUrl}}/job-descriptions?id=non-existent-id-123
+
+### 8. DELETE without ID (should return 400)
+DELETE {{baseUrl}}/job-descriptions
+
+### 9. Final GET to verify deletion
+GET {{baseUrl}}/job-descriptions

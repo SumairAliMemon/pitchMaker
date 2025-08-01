@@ -1,0 +1,63 @@
+### Test Job Descriptions API Operations (No Auth Version)
+### Replace TEST_USER_ID with any UUID (you can generate one)
+
+@baseUrl = http://localhost:3000/api
+@testUserId = 12345678-1234-1234-1234-123456789012
+
+### 1. GET job descriptions (should be empty initially)
+GET {{baseUrl}}/job-descriptions-test?user_id={{testUserId}}
+
+### 2. POST - Create job description with all fields
+POST {{baseUrl}}/job-descriptions-test
+Content-Type: application/json
+
+{
+  "user_id": "{{testUserId}}",
+  "title": "Full Stack Developer",
+  "company_name": "TechCorp Inc",
+  "description": "We are looking for a Full Stack Developer with experience in React, Node.js, and MongoDB. The ideal candidate should have 3+ years of experience building scalable web applications.",
+  "source_url": "https://example.com/job-posting"
+}
+
+### 3. POST - Create job description with only description (minimal)
+POST {{baseUrl}}/job-descriptions-test
+Content-Type: application/json
+
+{
+  "user_id": "{{testUserId}}",
+  "description": "We need a backend developer skilled in Node.js and database design. Experience with microservices architecture preferred."
+}
+
+### 4. POST - Test validation error (no description)
+POST {{baseUrl}}/job-descriptions-test
+Content-Type: application/json
+
+{
+  "user_id": "{{testUserId}}",
+  "title": "Software Engineer",
+  "company_name": "Some Company"
+}
+
+### 5. POST - Test validation error (no user_id)
+POST {{baseUrl}}/job-descriptions-test
+Content-Type: application/json
+
+{
+  "title": "Software Engineer",
+  "description": "Some job description"
+}
+
+### 6. GET job descriptions (should show the created ones)
+GET {{baseUrl}}/job-descriptions-test?user_id={{testUserId}}
+
+### 7. DELETE a job description (replace JOB_ID with actual ID from previous GET)
+DELETE {{baseUrl}}/job-descriptions-test?id=JOB_ID_HERE&user_id={{testUserId}}
+
+### 8. DELETE with invalid ID (should return 404)
+DELETE {{baseUrl}}/job-descriptions-test?id=invalid-id-123&user_id={{testUserId}}
+
+### 9. DELETE without ID (should return 400)
+DELETE {{baseUrl}}/job-descriptions-test?user_id={{testUserId}}
+
+### 10. Final GET to verify operations
+GET {{baseUrl}}/job-descriptions-test?user_id={{testUserId}}
