@@ -35,17 +35,14 @@ export default function PitchGenerator({
     setAnalyzing(true)
 
     try {
-      // Call the actual AI pitch generation API
+      // Call the simplified AI pitch generation API (only sends job_description)
       const response = await fetch('/api/generate-pitch', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          job_description: jobDescription,
-          job_title: 'Position', // Could be extracted from job description
-          company_name: 'Company', // Could be extracted from job description
-          use_saved_profile: true
+          job_description: jobDescription
         })
       })
 

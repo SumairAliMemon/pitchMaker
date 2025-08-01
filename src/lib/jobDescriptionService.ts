@@ -67,7 +67,6 @@ export const jobDescriptionService = {
         .from('job_descriptions')
         .select('*')
         .eq('user_id', userId)
-        .eq('is_saved', true)
         .order('created_at', { ascending: false })
 
       if (error) {
@@ -142,26 +141,6 @@ export const jobDescriptionService = {
       return true
     } catch (error) {
       console.error('Error deleting job description:', error)
-      return false
-    }
-  },
-
-  // Toggle save status
-  async toggleSaveStatus(jobId: string, isSaved: boolean): Promise<boolean> {
-    try {
-      const { error } = await supabase
-        .from('job_descriptions')
-        .update({ is_saved: isSaved })
-        .eq('id', jobId)
-
-      if (error) {
-        console.error('Error toggling save status:', error)
-        return false
-      }
-
-      return true
-    } catch (error) {
-      console.error('Error toggling save status:', error)
       return false
     }
   }

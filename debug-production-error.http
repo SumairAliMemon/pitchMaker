@@ -1,0 +1,50 @@
+### Debug Production 500 Error - Pitch Generation
+### Use this to test and debug the production issue
+
+### 1. Test API Health Check
+GET https://pitch-maker.vercel.app/api/debug/
+
+### 2. Test Supabase Config
+GET https://pitch-maker.vercel.app/api/supabase-config
+
+### 3. Test Simple Pitch Generation (with detailed error info)
+POST https://pitch-maker.vercel.app/api/generate-pitch
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "job_description": "We are looking for a software engineer with React and Node.js experience."
+}
+
+### 4. Test Environment Variables (if debug endpoint exists)
+GET https://pitch-maker.vercel.app/api/debug/env
+
+### 5. Test Gemini API directly (to isolate the issue)
+POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+Content-Type: application/json
+X-goog-api-key: YOUR_GEMINI_API_KEY_HERE
+
+{
+  "contents": [
+    {
+      "parts": [
+        {
+          "text": "Write a simple cover letter for a software engineer position."
+        }
+      ]
+    }
+  ]
+}
+
+### Common Production Issues to Check:
+# 1. NEXT_PUBLIC_GEMINI_API_KEY environment variable not set in Vercel
+# 2. API key format incorrect or expired
+# 3. Supabase configuration issues in production
+# 4. Database schema differences between local and production
+# 5. Missing environment variables in Vercel deployment
+
+### Fix Steps:
+# 1. Go to Vercel dashboard → Your project → Settings → Environment Variables
+# 2. Add NEXT_PUBLIC_GEMINI_API_KEY with your actual API key
+# 3. Redeploy the application
+# 4. Test again

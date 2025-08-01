@@ -1,0 +1,50 @@
+### TEST PRODUCTION DATABASE SCHEMA - EXACT MATCH
+### These tests match your EXACT production database schema
+
+@baseUrl = https://pitch-maker.vercel.app/api
+
+### 1. Test Job Description Creation (matches production schema)
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "title": "Full Stack Developer",
+  "company": "TechCorp Inc",
+  "description": "We are looking for a Full Stack Developer with experience in React, Node.js, and PostgreSQL."
+}
+
+### 2. Test Pitch Generation (should work with fixed schema)
+POST {{baseUrl}}/generate-pitch
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "job_description": "We are seeking a talented MERN Stack Developer to join our growing team at Innovation Labs. The ideal candidate will have extensive experience with MongoDB, Express.js, React.js, and Node.js."
+}
+
+### 3. Get All Job Descriptions
+GET {{baseUrl}}/job-descriptions
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 4. Test Minimal Job Description (only description required)
+POST {{baseUrl}}/job-descriptions
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "description": "Frontend developer needed. Must know React and TypeScript. Remote work available."
+}
+
+### SCHEMA FIXES APPLIED:
+# ✅ job_descriptions table: company_name → company
+# ✅ Removed non-existent fields: source_url, is_saved
+# ✅ pitches table: company_name remains (correct in production)
+# ✅ All interfaces updated to match production database
+# ✅ All API routes updated to match production database
+
+### Expected Results:
+# - No more 500 errors from database field mismatches
+# - Job descriptions should save successfully
+# - Pitch generation should work with Gemini API key
+# - Database operations should complete without SQL errors
