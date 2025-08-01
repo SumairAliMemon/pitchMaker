@@ -4,19 +4,16 @@ export interface JobDescription {
   id: string
   user_id: string
   title?: string | null
-  company_name?: string | null
+  company?: string | null
   description: string
-  source_url?: string | null
-  is_saved: boolean
   created_at: string
   updated_at: string
 }
 
 export interface CreateJobDescriptionData {
   title?: string
-  company_name?: string
+  company?: string
   description: string
-  source_url?: string
 }
 
 export const jobDescriptionService = {
@@ -31,10 +28,8 @@ export const jobDescriptionService = {
         .insert({
           user_id: userId,
           title: jobData.title || null,
-          company_name: jobData.company_name || null,
-          description: jobData.description,
-          source_url: jobData.source_url || null,
-          is_saved: true
+          company: jobData.company || null,
+          description: jobData.description
         })
         .select()
         .maybeSingle()
@@ -60,7 +55,7 @@ export const jobDescriptionService = {
   ): Promise<JobDescription | null> {
     return this.createJobDescription(userId, {
       title,
-      company_name: company,
+      company: company,
       description
     })
   },

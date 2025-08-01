@@ -12,7 +12,7 @@ Content-Type: application/json
 
 {
   "title": "Senior Full Stack Developer",
-  "company_name": "TechCorp Inc",
+  "company": "TechCorp Inc",
   "description": "We are looking for a senior full stack developer with experience in React, Node.js, and PostgreSQL. The ideal candidate will have 5+ years of experience building scalable web applications.",
   "source_url": "https://example.com/job-posting"
 }
@@ -31,7 +31,7 @@ Content-Type: application/json
 
 {
   "title": "Some Job",
-  "company_name": "Some Company"
+  "company": "Some Company"
 }
 
 ### 5. GET all job descriptions (should show created ones)

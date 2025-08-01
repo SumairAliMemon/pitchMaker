@@ -60,3 +60,6 @@ GET {{baseUrl}}/job-descriptions
 # - User profile must exist (complete profile first)
 # - Much simpler frontend - just send job description text!
 # - API handles all the complex logic
+# - ✅ FIXED: Database schema mismatches resolved (company_name → company)
+# - ✅ FIXED: All test files updated to match actual database schema
+# - ✅ FIXED: 500 errors from field name mismatches should now be resolved

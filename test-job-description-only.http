@@ -19,7 +19,7 @@ Content-Type: application/json
 
 {
   "job_description": "We are looking for a software engineer with experience in React, Node.js, and database design. The role involves building web applications and working with cross-functional teams to deliver high-quality software solutions.",
-  "company_name": "TechCorp Inc",
+  "company": "TechCorp Inc",
   "userProfile": {
     "full_name": "John Doe",
     "background_details": "MERN stack developer with 3 years of experience",
@@ -35,7 +35,7 @@ Content-Type: application/json
 
 {
   "job_description": "We are looking for a software engineer with experience in React, Node.js, and database design. The role involves building web applications and working with cross-functional teams to deliver high-quality software solutions.",
-  "company_name": "TechCorp Inc",
+  "company": "TechCorp Inc",
   "job_title": "Senior Full Stack Developer",
   "userProfile": {
     "full_name": "John Doe",

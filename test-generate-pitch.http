@@ -13,7 +13,7 @@ Content-Type: application/json
 {
   "job_description": "We are looking for a Full Stack Developer with experience in React, Node.js, and MongoDB. The candidate should have strong problem-solving skills.",
   "job_title": "Full Stack Developer",
-  "company_name": "Tech Solutions Inc",
+  "company": "Tech Solutions Inc",
   "user_profile": {
     "full_name": "Sumair",
     "background_details": "AI Engineer",
@@ -31,7 +31,7 @@ Authorization: Bearer YOUR_JWT_TOKEN_HERE
 {
   "job_description": "We are looking for a Full Stack Developer with experience in React, Node.js, and MongoDB. The ideal candidate should have strong problem-solving skills and experience with modern web development practices. You will be responsible for building scalable web applications and working with our development team.",
   "job_title": "Full Stack Developer",
-  "company_name": "Tech Solutions Inc",
+  "company": "Tech Solutions Inc",
   "use_saved_profile": true
 }
 
@@ -43,7 +43,7 @@ Authorization: Bearer YOUR_JWT_TOKEN_HERE
 {
   "job_description": "Looking for a Software Engineer with JavaScript experience. Must have good communication skills and ability to work in a team environment.",
   "job_title": "Software Engineer",
-  "company_name": "StartupCorp"
+  "company": "StartupCorp"
 }
 
 ### 3. Test with Long Job Description (MERN Stack)
@@ -54,7 +54,7 @@ Authorization: Bearer YOUR_JWT_TOKEN_HERE
 {
   "job_description": "We are seeking a talented MERN Stack Developer to join our growing team. The ideal candidate will have extensive experience with MongoDB, Express.js, React.js, and Node.js. Responsibilities include: - Developing and maintaining web applications using the MERN stack - Collaborating with cross-functional teams to define, design, and ship new features - Writing clean, maintainable, and efficient code - Participating in code reviews and providing constructive feedback - Troubleshooting and debugging applications - Staying up-to-date with emerging technologies and industry trends. Requirements: - Bachelor's degree in Computer Science or related field - 3+ years of experience with MERN stack development - Strong proficiency in JavaScript, HTML, and CSS - Experience with RESTful APIs and GraphQL - Knowledge of version control systems (Git) - Excellent problem-solving skills and attention to detail - Strong communication and teamwork abilities. We offer competitive salary, health benefits, flexible working hours, and opportunities for professional growth.",
   "job_title": "MERN Stack Developer",  
-  "company_name": "InnovateTech Solutions",
+  "company": "InnovateTech Solutions",
   "use_saved_profile": true
 }
 
@@ -65,7 +65,7 @@ Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
 {
   "job_title": "Developer",
-  "company_name": "Test Company"
+  "company": "Test Company"
 }
 
 ### 5. Test Direct Gemini API (for debugging)

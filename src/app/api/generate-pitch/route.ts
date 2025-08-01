@@ -73,9 +73,8 @@ export async function POST(request: NextRequest) {
       .insert({
         user_id: user.id,
         title: jobTitle || null,
-        company_name: companyName || null,
-        description: job_description.trim(),
-        is_saved: true
+        company: companyName || null,
+        description: job_description.trim()
       })
       .select()
       .single()

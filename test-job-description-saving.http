@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "job_description": "We are looking for a Senior Software Engineer to join our team at TechCorp. The role involves:\n\n- Building scalable web applications using React and Node.js\n- Working with cross-functional teams\n- Leading technical decisions\n- Mentoring junior developers\n\nRequirements:\n- 5+ years of JavaScript experience\n- Experience with React, Node.js, MongoDB\n- Strong problem-solving skills",
-  "company_name": "TechCorp Inc",
+  "company": "TechCorp Inc",
   "job_title": "Senior Software Engineer",
   "userProfile": {
     "full_name": "John Doe",
@@ -39,7 +39,7 @@ Content-Type: application/json
 
 {
   "title": "Backend Developer",
-  "company_name": "StartupXYZ",
+  "company": "StartupXYZ",
   "description": "We need a backend developer proficient in Node.js and Python. Experience with microservices architecture preferred.",
   "source_url": "https://example.com/job"
 }

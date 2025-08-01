@@ -14,7 +14,7 @@ Content-Type: application/json
 {
   "user_id": "{{testUserId}}",
   "title": "Full Stack Developer",
-  "company_name": "TechCorp Inc",
+  "company": "TechCorp Inc",
   "description": "We are looking for a Full Stack Developer with experience in React, Node.js, and MongoDB. The ideal candidate should have 3+ years of experience building scalable web applications.",
   "source_url": "https://example.com/job-posting"
 }
@@ -35,7 +35,7 @@ Content-Type: application/json
 {
   "user_id": "{{testUserId}}",
   "title": "Software Engineer",
-  "company_name": "Some Company"
+  "company": "Some Company"
 }
 
 ### 5. POST - Test validation error (no user_id)

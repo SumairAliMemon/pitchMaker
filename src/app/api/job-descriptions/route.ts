@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json()
-    const { title, company_name, description, source_url } = body
+    const { title, company, description } = body
 
     // Validate required fields
     if (!description || description.trim() === '') {
@@ -65,10 +65,8 @@ export async function POST(request: NextRequest) {
       .insert({
         user_id: user.id,
         title: title?.trim() || null,
-        company_name: company_name?.trim() || null,
-        description: description.trim(),
-        source_url: source_url?.trim() || null,
-        is_saved: true
+        company: company?.trim() || null,
+        description: description.trim()
       })
       .select()
       .single()

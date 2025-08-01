@@ -14,9 +14,8 @@ Content-Type: application/json
 
 {
   "title": "Senior Full Stack Developer",
-  "company_name": "TechCorp Inc", 
-  "description": "We are looking for a senior full stack developer with experience in React, Node.js, and PostgreSQL. Must have 5+ years experience building scalable web applications.",
-  "source_url": "https://example.com/job-posting"
+  "company": "TechCorp Inc", 
+  "description": "We are looking for a senior full stack developer with experience in React, Node.js, and PostgreSQL. Must have 5+ years experience building scalable web applications."
 }
 
 ### 3. POST - Create job description with minimal data (only description)
@@ -33,7 +32,7 @@ Content-Type: application/json
 
 {
   "title": "Backend Engineer",
-  "company_name": "StartupXYZ",
+  "company": "StartupXYZ",
   "description": "Looking for a backend engineer with Node.js and MongoDB experience. Join our growing team!"
 }
 
@@ -48,7 +47,7 @@ Content-Type: application/json
 
 {
   "title": "Some Job",
-  "company_name": "Some Company"
+  "company": "Some Company"
 }
 
 ### 7. POST - Test with empty description
@@ -91,7 +90,7 @@ Content-Type: application/json
 {
   "job_description": "We are seeking a MERN Stack Developer to join our dynamic team. The ideal candidate will have experience with MongoDB, Express.js, React, and Node.js. Responsibilities include building responsive web applications, API development, and database design.",
   "job_title": "MERN Stack Developer",
-  "company_name": "Innovation Labs",
+  "company": "Innovation Labs",
   "userProfile": {
     "full_name": "John Doe",
     "background_details": "Full-stack developer with 3 years of experience in MERN stack development",
@@ -112,7 +111,7 @@ Content-Type: application/json
 
 {
   "title": "Software Engineer",
-  "company_name": "BigTech Corp",
+  "company": "BigTech Corp",
   "description": "This is a very long job description that tests how the system handles large amounts of text. We are looking for an exceptional software engineer who can work with multiple technologies including but not limited to JavaScript, Python, Java, C++, React, Angular, Vue.js, Node.js, Express.js, Django, Flask, Spring Boot, PostgreSQL, MongoDB, Redis, AWS, Docker, Kubernetes, and many more technologies. The candidate should have excellent problem-solving skills, strong communication abilities, and the capability to work in a fast-paced environment with tight deadlines."
 }
 
@@ -122,7 +121,7 @@ Content-Type: application/json
 
 {
   "title": "DevOps Engineer",
-  "company_name": "Tech & Innovation Co., Ltd.",
+  "company": "Tech & Innovation Co., Ltd.",
   "description": "DevOps position with competitive salary. Must know AWS, Docker, and Kubernetes."
 }
 
