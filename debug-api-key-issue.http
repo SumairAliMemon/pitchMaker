@@ -1,0 +1,38 @@
+### DEBUG PRODUCTION API KEY ISSUE
+
+### 1. Check API Key Status in Production
+GET https://pitch-maker.vercel.app/api/debug-api-key
+
+### 2. Test Gemini API Directly with Your Key
+POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+Content-Type: application/json
+X-goog-api-key: AIzaSyApeU7dGzKFodIYkqOUOM0-SetHQ-jVPXIe
+
+{
+  "contents": [
+    {
+      "parts": [
+        {
+          "text": "Write a simple test message"
+        }
+      ]
+    }
+  ]
+}
+
+### 3. Check Vercel Logs
+# Go to: https://vercel.com/your-username/pitch-maker/functions
+# Look for runtime logs to see the exact error
+
+### Expected Debug Results:
+# If API key is missing in production:
+# {
+#   "hasApiKey": false,
+#   "apiKeyFull": "NOT_SET"
+# }
+
+# If API key exists:
+# {
+#   "hasApiKey": true,
+#   "apiKeyFull": "AIzaSyApeU7dGzKFodIYkqOUOM0-SetHQ-jVPXIe"
+# }
