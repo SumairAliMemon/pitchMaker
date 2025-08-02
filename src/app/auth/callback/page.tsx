@@ -50,15 +50,34 @@ export default function AuthCallback() {
           console.log('🔄 Found authorization code, exchanging for session')
           
           try {
+            // First, check if we have the required PKCE data
+            const codeVerifier = localStorage.getItem(`supabase.auth.token.${code}`) || 
+                                localStorage.getItem('supabase.auth.code_verifier') ||
+                                sessionStorage.getItem('supabase.auth.code_verifier')
+            
+            console.log('🔍 Code verifier exists:', !!codeVerifier)
+            
+            if (!codeVerifier) {
+              console.error('❌ Missing code verifier for PKCE flow')
+              // Try to use the implicit flow as fallback
+              window.location.href = `${window.location.origin}/login?fallback=implicit`
+              return
+            }
+
             const { data, error } = await supabase.auth.exchangeCodeForSession(code)
             
             if (error) {
               console.error('❌ Code exchange error:', error)
-              // Clear any stored code verifier that might be corrupted
-              if (typeof window !== 'undefined') {
-                localStorage.removeItem('supabase.auth.token')
+              
+              // If PKCE fails, clear all auth data and redirect to login
+              if (error.message.includes('code verifier') || error.message.includes('invalid request')) {
+                console.log('🧹 Clearing corrupted PKCE data and redirecting to login')
+                localStorage.clear()
                 sessionStorage.clear()
+                window.location.href = `${window.location.origin}/login?error=pkce_failed`
+                return
               }
+              
               router.push(`/auth/auth-code-error?error=${encodeURIComponent(error.message)}`)
               return
             }
@@ -70,12 +89,10 @@ export default function AuthCallback() {
             }
           } catch (exchangeError) {
             console.error('❌ Exchange process failed:', exchangeError)
-            // Clear storage and retry
-            if (typeof window !== 'undefined') {
-              localStorage.removeItem('supabase.auth.token')
-              sessionStorage.clear()
-            }
-            router.push('/auth/auth-code-error?error=exchange_failed')
+            // Clear storage and redirect to login with error
+            localStorage.clear()
+            sessionStorage.clear()
+            window.location.href = `${window.location.origin}/login?error=exchange_failed`
             return
           }
         }

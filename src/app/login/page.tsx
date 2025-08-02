@@ -16,6 +16,23 @@ export default function LoginPage() {
   const [isSuccess, setIsSuccess] = useState(false)
   const router = useRouter()
 
+  // Check for error messages from failed auth
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const error = urlParams.get('error')
+    const fallback = urlParams.get('fallback')
+    
+    if (error === 'pkce_failed') {
+      setMessage('Authentication failed. Please try signing in again.')
+      setIsSuccess(false)
+    } else if (error === 'exchange_failed') {
+      setMessage('Login process interrupted. Please try again.')
+      setIsSuccess(false)
+    } else if (fallback === 'implicit') {
+      setMessage('Switching to alternative login method...')
+    }
+  }, [])
+
   // Listen for auth success from other tabs
   useEffect(() => {
     const cleanup = AuthStateManager.onAuthSuccess(() => {
@@ -32,6 +49,22 @@ export default function LoginPage() {
     setMessage('')
 
     try {
+      // Clear any existing session or corrupted auth state
+      await supabase.auth.signOut()
+      
+      // Clear localStorage to remove any corrupted PKCE data
+      if (typeof window !== 'undefined') {
+        // Clear Supabase auth tokens
+        const keysToRemove = []
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i)
+          if (key && key.startsWith('supabase.auth.token')) {
+            keysToRemove.push(key)
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key))
+      }
+
       const redirectUrl = `${window.location.origin}/auth/callback`
       console.log('Magic link redirect URL:', redirectUrl)
       
