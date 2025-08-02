@@ -44,20 +44,38 @@ export default function AuthCallback() {
         const urlParams = new URLSearchParams(window.location.search)
         const code = urlParams.get('code')
         
+        console.log('🔍 Authorization code found:', !!code)
+        
         if (code) {
           console.log('🔄 Found authorization code, exchanging for session')
           
-          const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-          
-          if (error) {
-            console.error('❌ Code exchange error:', error)
-            router.push(`/auth/auth-code-error?error=${encodeURIComponent(error.message)}`)
-            return
-          }
+          try {
+            const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+            
+            if (error) {
+              console.error('❌ Code exchange error:', error)
+              // Clear any stored code verifier that might be corrupted
+              if (typeof window !== 'undefined') {
+                localStorage.removeItem('supabase.auth.token')
+                sessionStorage.clear()
+              }
+              router.push(`/auth/auth-code-error?error=${encodeURIComponent(error.message)}`)
+              return
+            }
 
-          if (data?.session) {
-            console.log('✅ Code exchange successful!')
-            router.push('/pitch-dashboard')
+            if (data?.session) {
+              console.log('✅ Code exchange successful!')
+              router.push('/pitch-dashboard')
+              return
+            }
+          } catch (exchangeError) {
+            console.error('❌ Exchange process failed:', exchangeError)
+            // Clear storage and retry
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('supabase.auth.token')
+              sessionStorage.clear()
+            }
+            router.push('/auth/auth-code-error?error=exchange_failed')
             return
           }
         }
